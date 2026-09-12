@@ -237,3 +237,6 @@ cmake -B build/release \
 -DCMAKE_BUILD_TYPE=Release
 ```
 
+## Inspiration
+
+The [qlibs/reflect](https://github.com/qlibs/reflect) library provided some inspiration, but it lacks annotation support. Because `kon::qi` implements annotations, its implementation of enum reflection is no longer limited by scan ranges. In addition, this library includes numerous optimizations at the implementation level, minimizing repeated compile-time computations.
