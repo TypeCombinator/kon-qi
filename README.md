@@ -25,7 +25,7 @@ enum class color : unsigned {
     blue
 };
 
-using minfo = kon::qi::e_reflect<color>;
+using minfo = kon::qi::reflect_e<color>;
 
 static_assert(minfo::to_name(color::red) == std::string_view{"red"});
 static_assert(minfo::to_name(color::green) == std::string_view{"green"});
@@ -47,7 +47,7 @@ struct point {
     double z;
 };
 
-using minfo = kon::qi::s_reflect<point>;
+using minfo = kon::qi::reflect_s<point>;
 
 static_assert(minfo::size() == 3);
 static_assert(minfo::member_name(0) == std::string_view{"x"});
@@ -99,7 +99,7 @@ struct addon_register<system_error> {
 };
 } // namespace kon::qi
 
-using minfo = kon::qi::e_reflect<system_error>;
+using minfo = kon::qi::reflect_e<system_error>;
 using addon = minfo::addon_type;
 
 static_assert(minfo::min() == system_error::a);
@@ -147,7 +147,7 @@ struct point {
     };
 };
 
-using minfo = kon::qi::s_reflect<point>;
+using minfo = kon::qi::reflect_s<point>;
 using addon = minfo::addon_type;
 
 using pa_addon = addon::of<minfo::addon_tag_t<0>>;
@@ -189,7 +189,7 @@ struct addon_register<point> {
 };
 } // namespace kon::qi
 
-using minfo = kon::qi::s_reflect<point>;
+using minfo = kon::qi::reflect_s<point>;
 using addon = minfo::addon_type;
 
 using pa_addon = addon::of<minfo::addon_tag_t<0>>;

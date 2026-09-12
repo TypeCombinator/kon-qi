@@ -41,10 +41,10 @@ struct s_foo_lref {
 // Notice: Non-const lvalue reference members are not supported!
 // static_assert(kon::qi::member_count<s_foo_lref>() == 1);
 
-using s_foo0_minfo = kon::qi::s_reflect<qi_struct_test::s_foo0>;
+using s_foo0_minfo = kon::qi::reflect_s<qi_struct_test::s_foo0>;
 static_assert(s_foo0_minfo::size() == 0);
 
-using s_foo3_minfo = kon::qi::s_reflect<qi_struct_test::s_foo3>;
+using s_foo3_minfo = kon::qi::reflect_s<qi_struct_test::s_foo3>;
 static_assert(s_foo3_minfo::member_name<0>() == std::string_view{"a"});
 static_assert(s_foo3_minfo::member_name<1>() == std::string_view{"b"});
 static_assert(s_foo3_minfo::member_name<2>() == std::string_view{"c"});

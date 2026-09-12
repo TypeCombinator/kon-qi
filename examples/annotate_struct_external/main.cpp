@@ -21,7 +21,7 @@ struct addon_register<point> {
 };
 } // namespace kon::qi
 
-using minfo = kon::qi::s_reflect<point>;
+using minfo = kon::qi::reflect_s<point>;
 using addon = minfo::addon_type;
 
 using pa_addon = addon::of<minfo::addon_tag_t<0>>;

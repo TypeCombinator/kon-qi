@@ -25,7 +25,7 @@ static_assert(!kon::qi::has_external_addon<foo<'X'>>);
 
 template <typename T, char V>
 consteval bool test_struct_foo_addon() noexcept {
-    using minfo = kon::qi::s_reflect<T>;
+    using minfo = kon::qi::reflect_s<T>;
     using addon = minfo::addon_type;
 
     using foo_a_addon = addon::template of<typename minfo::template addon_tag_t<0>>;

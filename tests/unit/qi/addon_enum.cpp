@@ -47,7 +47,7 @@ struct addon_register<kq_addon_enum_test::foo_sparse> {
 namespace kq_addon_enum_test {
 template <typename ET>
 consteval bool test_enum_foo_addon() noexcept {
-    using minfo = kon::qi::e_reflect<ET>;
+    using minfo = kon::qi::reflect_e<ET>;
     using addon = minfo::addon_type;
 
     static_assert(kon::qi::has_enum_value_range<addon>);
@@ -74,7 +74,7 @@ consteval bool test_enum_foo_addon() noexcept {
 static_assert(test_enum_foo_addon<foo>());
 static_assert(test_enum_foo_addon<foo_sparse>());
 
-using foo_minfo = kon::qi::e_reflect<foo_sparse>;
+using foo_minfo = kon::qi::reflect_e<foo_sparse>;
 static_assert(!foo_minfo::is_continuous());
 static_assert(static_cast<int>(foo_minfo::min()) == 0);
 static_assert(static_cast<int>(foo_minfo::max()) == 1001);

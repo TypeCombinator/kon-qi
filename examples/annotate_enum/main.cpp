@@ -25,7 +25,7 @@ struct addon_register<system_error> {
 };
 } // namespace kon::qi
 
-using minfo = kon::qi::e_reflect<system_error>;
+using minfo = kon::qi::reflect_e<system_error>;
 using addon = minfo::addon_type;
 
 static_assert(minfo::min() == system_error::a);

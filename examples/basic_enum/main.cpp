@@ -6,7 +6,7 @@ enum class color : unsigned {
     blue
 };
 
-using minfo = kon::qi::e_reflect<color>;
+using minfo = kon::qi::reflect_e<color>;
 
 static_assert(minfo::to_name(color::red) == std::string_view{"red"});
 static_assert(minfo::to_name(color::green) == std::string_view{"green"});
