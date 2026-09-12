@@ -1,0 +1,2 @@
+add_subdirectory(basic_enum)
+add_subdirectory(basic_struct)

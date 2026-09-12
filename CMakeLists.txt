@@ -29,7 +29,7 @@ endif()
 add_subdirectory(kon)
 
 if(KON_QI_BUILD_EXAMPLES)
-    # add_subdirectory(examples)
+    add_subdirectory(examples)
 endif()
 
 if(KON_QI_BUILD_TESTING)
