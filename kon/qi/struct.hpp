@@ -151,7 +151,7 @@ consteval struct_information<N> make_struct_information() noexcept {
 }
 
 template <typename T>
-struct s_reflect {
+struct reflect_s {
     using type = T;
 
     // TODO: Remove this help function, This doesn't apply to types that can't be evaluated at
@@ -229,9 +229,7 @@ struct s_reflect {
     }
 
     template <std::size_t I>
-    static consteval auto addon_tag() noexcept {
-        return kon::qi::addon_tag<sm_maddrs.template get<I>()>{};
-    }
+    using addon_tag_t = kon::qi::addon_tag<sm_maddrs.template get<I>()>;
 };
 
 } // namespace qi

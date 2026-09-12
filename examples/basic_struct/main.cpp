@@ -1,12 +1,13 @@
 #include <kon/qi/struct.hpp>
 
+// Only aggregate types are supported.
 struct point {
     double x;
     double y;
     double z;
 };
 
-using minfo = kon::qi::s_reflect<point>;
+using minfo = kon::qi::reflect_s<point>;
 
 static_assert(minfo::size() == 3);
 static_assert(minfo::member_name(0) == std::string_view{"x"});
