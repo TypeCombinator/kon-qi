@@ -6,32 +6,14 @@
 #define ADDON_1A34AF33_3863_4910_984C_743C4E4BD1CD
 #include <kon/qi/pack.hpp>
 
-// TODO: It may be better to declare a function without defining it.
 #define KON_QI_ADDON_M(_m_, ...)                                                                   \
-    static consteval auto of(kon::qi::addon_tag<&(CODECL<addon_host_type>._m_)>) noexcept {        \
-        return kon::qi::value_pack<__VA_ARGS__>{};                                                 \
-    }
-
-#define KON_QI_ADDON_M1(_m_, ...)                                                                  \
     static kon::qi::value_pack<__VA_ARGS__> of_impl(                                               \
         kon::qi::addon_tag<&(CODECL<addon_host_type>._m_)>)
 
 #define KON_QI_ADDON_E(_e_, ...)                                                                   \
-    static consteval auto of(kon::qi::addon_tag<addon_host_type::_e_>) noexcept {                  \
-        return kon::qi::value_pack<__VA_ARGS__>{};                                                 \
-    }
-
-#define KON_QI_ADDON_E1(_e_, ...)                                                                  \
     static kon::qi::value_pack<__VA_ARGS__> of_impl(kon::qi::addon_tag<addon_host_type::_e_>)
 
-
 #define KON_QI_ADDON_INIT()                                                                        \
-    template <auto maddr>                                                                          \
-    static consteval auto of(kon::qi::addon_tag<maddr>) noexcept {                                 \
-        return kon::qi::value_pack<>{};                                                            \
-    }
-
-#define KON_QI_ADDON_INIT1()                                                                       \
     template <auto maddr>                                                                          \
     static kon::qi::value_pack<> of_impl(kon::qi::addon_tag<maddr>);                               \
     template <typename Tag>                                                                        \
@@ -45,7 +27,7 @@ struct addon_tag { };
 
 template <typename T>
 struct addon_register {
-    KON_QI_ADDON_INIT1();
+    KON_QI_ADDON_INIT();
     // Empty addon.
 };
 

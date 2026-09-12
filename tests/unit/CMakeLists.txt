@@ -1,5 +1,4 @@
 add_executable(kon_qi_tests
-    qi/addon.cpp
     qi/enum.cpp
     qi/member.cpp
     qi/struct.cpp

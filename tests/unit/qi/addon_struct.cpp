@@ -12,11 +12,11 @@ struct foo {
     struct addon_register {
         static constexpr std::size_t count_range[2] = {3, 10};
 
-        KON_QI_ADDON_M1(a, 100, nullptr);
-        KON_QI_ADDON_M1(b, V);
-        KON_QI_ADDON_M1(c);
+        KON_QI_ADDON_M(a, 100, nullptr);
+        KON_QI_ADDON_M(b, V);
+        KON_QI_ADDON_M(c);
 
-        KON_QI_ADDON_INIT1();
+        KON_QI_ADDON_INIT();
     };
 };
 
@@ -63,11 +63,11 @@ struct addon_register<kq_addon_struct_test::foo_ext<V>> {
     using addon_host_type = kq_addon_struct_test::foo_ext<V>;
     static constexpr std::size_t count_rasnge[2] = {3, 10};
 
-    KON_QI_ADDON_M1(a, 100, nullptr);
-    KON_QI_ADDON_M1(b, V);
-    KON_QI_ADDON_M1(c);
+    KON_QI_ADDON_M(a, 100, nullptr);
+    KON_QI_ADDON_M(b, V);
+    KON_QI_ADDON_M(c);
 
-    KON_QI_ADDON_INIT1();
+    KON_QI_ADDON_INIT();
 };
 } // namespace kon::qi
 

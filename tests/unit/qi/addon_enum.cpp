@@ -22,11 +22,11 @@ struct addon_register<kq_addon_enum_test::foo> {
     static constexpr int value_range[][2] = {
         {0, 10},
     };
-    KON_QI_ADDON_E1(a, 100, nullptr);
-    KON_QI_ADDON_E1(b, 'X');
-    KON_QI_ADDON_E1(c);
+    KON_QI_ADDON_E(a, 100, nullptr);
+    KON_QI_ADDON_E(b, 'X');
+    KON_QI_ADDON_E(c);
 
-    KON_QI_ADDON_INIT1();
+    KON_QI_ADDON_INIT();
 };
 
 template <>
@@ -36,10 +36,11 @@ struct addon_register<kq_addon_enum_test::foo_sparse> {
         {   0,   10},
         {1000, 1010},
     };
-    KON_QI_ADDON_E1(a, 100, nullptr);
-    KON_QI_ADDON_E1(b, 'X');
-    KON_QI_ADDON_E1(c);
-    KON_QI_ADDON_INIT1();
+    KON_QI_ADDON_E(a, 100, nullptr);
+    KON_QI_ADDON_E(b, 'X');
+    KON_QI_ADDON_E(c);
+
+    KON_QI_ADDON_INIT();
 };
 } // namespace kon::qi
 
