@@ -69,6 +69,8 @@ static_assert(minfo::member_offset<2>() == 16);
 
 ### Annotation
 
+The word `annotation` is too long, so this library uses `addon` instead. As you know, naming is a hard problem.
+
 #### Enum with annotations
 
 ```c++
