@@ -229,11 +229,6 @@ struct s_reflect {
     }
 
     template <std::size_t I>
-    static consteval auto addon_tag() noexcept {
-        return kon::qi::addon_tag<sm_maddrs.template get<I>()>{};
-    }
-
-    template <std::size_t I>
     using addon_tag_t = kon::qi::addon_tag<sm_maddrs.template get<I>()>;
 };
 

@@ -1,5 +1,6 @@
 #include <kon/qi/struct.hpp>
 
+// Only aggregate types are supported.
 struct point {
     double x;
     double y;

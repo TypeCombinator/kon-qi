@@ -1,2 +1,5 @@
 add_subdirectory(basic_enum)
 add_subdirectory(basic_struct)
+add_subdirectory(annotate_enum)
+add_subdirectory(annotate_struct_internal)
+add_subdirectory(annotate_struct_external)
