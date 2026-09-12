@@ -11,6 +11,9 @@ static_assert(kon::qi::member_name<&s_foo3::a>() == std::string_view{"a"});
 static_assert(kon::qi::member_name<&s_foo3::b>() == std::string_view{"b"});
 static_assert(kon::qi::member_name<&s_foo3::c>() == std::string_view{"c"});
 
+static_assert(kon::qi::offset_of(&s_foo3::a) == 0);
+static_assert(kon::qi::offset_of(&s_foo3::b) == 4);
+static_assert(kon::qi::offset_of(&s_foo3::c) == 8);
 
 static_assert(kon::qi::is_member_pointer_v<&s_foo3::a>);
 static_assert(kon::qi::is_member_pointer_v<&s_foo3::c>);

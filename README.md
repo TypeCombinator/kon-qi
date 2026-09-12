@@ -205,6 +205,28 @@ using pz_addon = addon::of<minfo::addon_tag_t<2>>;
 static_assert(pz_addon::size() == 0);
 ```
 
+### Others
+
+#### Opinter to member
+
+```c++
+#include <kon/qi/member.hpp>
+
+struct foo {
+    int a;
+    char b;
+    const double c;
+};
+
+static_assert(kon::qi::member_name<&foo::a>() == std::string_view{"a"});
+static_assert(kon::qi::member_name<&foo::b>() == std::string_view{"b"});
+static_assert(kon::qi::member_name<&foo::c>() == std::string_view{"c"});
+
+static_assert(kon::qi::offset_of(&foo::a) == 0);
+static_assert(kon::qi::offset_of(&foo::b) == 4);
+static_assert(kon::qi::offset_of(&foo::c) == 8);
+```
+
 ## How to build
 
 ```shell
