@@ -12,16 +12,30 @@
         return kon::qi::value_pack<__VA_ARGS__>{};                                                 \
     }
 
+#define KON_QI_ADDON_M1(_m_, ...)                                                                  \
+    static kon::qi::value_pack<__VA_ARGS__> of_impl(                                               \
+        kon::qi::addon_tag<&(CODECL<addon_host_type>._m_)>)
+
 #define KON_QI_ADDON_E(_e_, ...)                                                                   \
     static consteval auto of(kon::qi::addon_tag<addon_host_type::_e_>) noexcept {                  \
         return kon::qi::value_pack<__VA_ARGS__>{};                                                 \
     }
+
+#define KON_QI_ADDON_E1(_e_, ...)                                                                  \
+    static kon::qi::value_pack<__VA_ARGS__> of_impl(kon::qi::addon_tag<addon_host_type::_e_>)
+
 
 #define KON_QI_ADDON_INIT()                                                                        \
     template <auto maddr>                                                                          \
     static consteval auto of(kon::qi::addon_tag<maddr>) noexcept {                                 \
         return kon::qi::value_pack<>{};                                                            \
     }
+
+#define KON_QI_ADDON_INIT1()                                                                       \
+    template <auto maddr>                                                                          \
+    static kon::qi::value_pack<> of_impl(kon::qi::addon_tag<maddr>);                               \
+    template <typename Tag>                                                                        \
+    using of = decltype(of_impl(Tag{}))
 
 namespace kon {
 //
@@ -31,7 +45,7 @@ struct addon_tag { };
 
 template <typename T>
 struct addon_register {
-    KON_QI_ADDON_INIT();
+    KON_QI_ADDON_INIT1();
     // Empty addon.
 };
 
@@ -41,6 +55,8 @@ concept has_internal_addon = requires() { typename T::template addon_register<>;
 template <typename T>
 concept has_external_addon = requires() { typename addon_register<T>::addon_host_type; };
 
+template <typename Addon>
+concept has_enum_value_range = requires() { Addon::value_range; };
 } // namespace qi
 } // namespace kon
 

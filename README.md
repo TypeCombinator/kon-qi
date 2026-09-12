@@ -35,7 +35,7 @@ static_assert(minfo::to_name(static_cast<color>(10)) == std::string_view{""});
 static_assert(minfo::to_name(static_cast<color>(10), "invalid") == std::string_view{"invalid"});
 ```
 
-#### Struct
+#### Struct (Only aggregate types are supported)
 
 ```c++
 #include <kon/qi/struct.hpp>

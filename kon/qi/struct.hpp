@@ -232,6 +232,9 @@ struct s_reflect {
     static consteval auto addon_tag() noexcept {
         return kon::qi::addon_tag<sm_maddrs.template get<I>()>{};
     }
+
+    template <std::size_t I>
+    using addon_tag_t = kon::qi::addon_tag<sm_maddrs.template get<I>()>;
 };
 
 } // namespace qi
