@@ -130,7 +130,7 @@ static_assert(ed_addon::size() == 0);
 
 ##### Use the default internal annotation
 
-There are two ways to add internal annotations. One is the **default internal annotation**, which requires separation from the member declaration, all annotations are placed in a template class named `addon_register`. 
+There are two ways to add internal annotations, they are mutually exclusive, and you can only choose one of them. One is the **default internal annotation**, which requires separation from the member declaration, all annotations are placed in a template class named `addon_register`. 
 
 ```c++
 #include <kon/qi/struct.hpp>
@@ -169,7 +169,7 @@ using pz_addon = addon::of<minfo::addon_tag_t<2>>;
 static_assert(pz_addon::size() == 0);
 ```
 
-##### Use the default inline annotation
+##### Use the inline annotation
 
 The other is **inline annotation**, which require the CMake option `KON_QI_ENABLE_INLINE_ADDON` to be set to `ON`, in this case, the annotation and the member variable declaration are on the same line.
 
@@ -307,6 +307,7 @@ static_assert(minfo::size() == 3);
 
 - An instantiated `addon_register` must be constructible at compile time.
 - Whenever annotations are used, `addon_host_type` must be declared.
+- Declared intervals are unified as closed intervals.
 
 ### Others
 
