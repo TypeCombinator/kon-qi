@@ -154,19 +154,23 @@ template <typename T>
 struct reflect_s {
     using type = T;
 
-    // TODO: Remove this help function, This doesn't apply to types that can't be evaluated at
-    // compile time.
-    static consteval auto addon() noexcept {
 #if defined(KON_QI_ENABLE_INLINE_ADDON)
+    static consteval auto addon() noexcept {
         if constexpr (requires() { typename T::addon_host_type; }) {
-            return T{};
+            return std::type_identity<T>{};
+        } else if constexpr (requires() { typename addon_register<T>::addon_host_type; }) {
+            return std::type_identity<addon_register<T>>{};
+        } else {
+            return std::type_identity<addon_register<void>>{};
         }
+    }
+
+    using addon_type = decltype(addon())::type;
 #else
+    static consteval auto addon() noexcept {
         if constexpr (requires() { typename T::template addon_register<>; }) {
             return typename T::template addon_register<>{};
-        }
-#endif
-        else if constexpr (requires() { typename addon_register<T>::addon_host_type; }) {
+        } else if constexpr (requires() { typename addon_register<T>::addon_host_type; }) {
             return addon_register<T>{};
         } else {
             return addon_register<void>{};
@@ -174,6 +178,7 @@ struct reflect_s {
     }
 
     using addon_type = decltype(addon());
+#endif
 
     static consteval auto member_count_select() noexcept {
         if constexpr (requires() { addon_type::count_range; }) {

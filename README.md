@@ -303,6 +303,11 @@ using minfo = kon::qi::reflect_s<point>;
 static_assert(minfo::size() == 3);
 ```
 
+#### Notices
+
+- An instantiated `addon_register` must be constructible at compile time.
+- Whenever annotations are used, `addon_host_type` must be declared.
+
 ### Others
 
 #### Opinter to member
@@ -335,9 +340,11 @@ cmake -B build/release \
 -DKON_QI_BUILD_EXAMPLES=ON \
 -DKON_QI_BUILD_TESTING=ON \
 -DCMAKE_BUILD_TYPE=Release
+
+ninja -C build/release
 ```
 
-### Use the default inline annotation
+### Use the inline annotation
 
 ```shell
 cmake -B build/release \
@@ -346,6 +353,8 @@ cmake -B build/release \
 -DKON_QI_BUILD_EXAMPLES=ON \
 -DKON_QI_BUILD_TESTING=ON \
 -DCMAKE_BUILD_TYPE=Release
+
+ninja -C build/release
 ```
 
 ## Inspiration

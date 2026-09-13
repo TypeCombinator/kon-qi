@@ -137,8 +137,6 @@ consteval auto make_enum_infomation() noexcept {
 
 template <typename ET>
 struct reflect_e {
-    // TODO: Remove this help function, This doesn't apply to types that can't be evaluated at
-    // compile time.
     static consteval auto addon() noexcept {
         if constexpr (requires() { typename addon_register<ET>::addon_host_type; }) {
             return addon_register<ET>{};
