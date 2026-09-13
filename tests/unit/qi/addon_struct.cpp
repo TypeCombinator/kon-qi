@@ -1,6 +1,22 @@
 #include <kon/qi/struct.hpp>
 
 namespace kq_addon_struct_test {
+#if defined(KON_QI_ENABLE_INLINE_ADDON)
+template <char V>
+struct foo {
+    using addon_host_type = foo;
+    static constexpr std::size_t count_range[2] = {3, 10};
+
+    int KON_QI_IADDON_M(a, 100, nullptr);
+    double KON_QI_IADDON_M(b, V);
+    const char KON_QI_IADDON_M(c);
+    short d;
+
+    KON_QI_IADDON_INIT();
+};
+
+static_assert(kon::qi::has_inline_addon<foo<'X'>>);
+#else
 template <char V>
 struct foo {
     int a;
@@ -21,12 +37,15 @@ struct foo {
 };
 
 static_assert(kon::qi::has_internal_addon<foo<'X'>>);
+#endif
 static_assert(!kon::qi::has_external_addon<foo<'X'>>);
 
 template <typename T, char V>
 consteval bool test_struct_foo_addon() noexcept {
     using minfo = kon::qi::reflect_s<T>;
     using addon = minfo::addon_type;
+
+    static_assert(kon::qi::has_struct_count_range<addon>);
 
     using foo_a_addon = addon::template of<typename minfo::template addon_tag_t<0>>;
     static_assert(foo_a_addon::size() == 2);
@@ -61,7 +80,7 @@ namespace kon::qi {
 template <char V>
 struct addon_register<kq_addon_struct_test::foo_ext<V>> {
     using addon_host_type = kq_addon_struct_test::foo_ext<V>;
-    static constexpr std::size_t count_rasnge[2] = {3, 10};
+    static constexpr std::size_t count_range[2] = {3, 10};
 
     KON_QI_ADDON_M(a, 100, nullptr);
     KON_QI_ADDON_M(b, V);
