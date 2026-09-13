@@ -358,6 +358,32 @@ cmake -B build/release \
 ninja -C build/release
 ```
 
+## How to use
+
+There is a public example project available to help you get started with this library quickly, please see [kon-qi-starter](https://github.com/TypeCombinator/cpp-samples/tree/main/kon-qi-starter). The important usage steps are as follows:
+
+First, use `FetchContent` in your C++ project’s CMake file to fetch this library. 
+
+```cmake
+set(KON_QI_ENABLE_INLINE_ADDON OFF CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+    kon-qi
+    GIT_REPOSITORY https://github.com/TypeCombinator/kon-qi.git
+    GIT_TAG        4e4b107c04e037220f57ca9dd988cb7c731f3bc9
+)
+FetchContent_MakeAvailable(kon-qi)
+```
+
+Then, simply link this library to the target you want to build.
+
+```cmake
+target_link_libraries(${YOUR_TARGET}
+  PUBLIC
+  kon::qi
+)
+```
+
 ## Inspiration
 
 The [qlibs/reflect](https://github.com/qlibs/reflect) library provided some inspiration, but it lacks annotation support. Because `kon::qi` implements annotations, its implementation of enum reflection is no longer limited by scan ranges. In addition, `kon::qi` includes numerous optimizations at the implementation level, minimizing repeated compile-time computations.
