@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 
-option(KON_QI_BUILD_TESTS "Build tests" OFF)
-option(KON_QI_BUILD_EXAMPLES "Build examples" ON)
+option(KON_QI_ENABLE_INLINE_ADDON "Enable inline addon (annotation)." OFF)
+option(KON_QI_BUILD_TESTS "Build tests." OFF)
+option(KON_QI_BUILD_EXAMPLES "Build examples." ON)
 
 project(project_kon_qi LANGUAGES C CXX)
 

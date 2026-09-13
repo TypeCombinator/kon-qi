@@ -6,8 +6,6 @@
 #define ADDON_1A34AF33_3863_4910_984C_743C4E4BD1CD
 #include <kon/qi/pack.hpp>
 
-#define KON_QI_ENABLE_INLINE_ADDON
-
 #if defined(KON_QI_ENABLE_INLINE_ADDON)
     // Inline addon for the struct member.
     #define KON_QI_IADDON_M(_m_, ...)                                                              \
