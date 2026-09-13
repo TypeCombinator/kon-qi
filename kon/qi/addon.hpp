@@ -39,6 +39,9 @@ concept has_external_addon = requires() { typename addon_register<T>::addon_host
 
 template <typename Addon>
 concept has_enum_value_range = requires() { Addon::value_range; };
+
+template <typename Addon>
+concept has_struct_count_range = requires() { Addon::count_range; };
 } // namespace qi
 } // namespace kon
 

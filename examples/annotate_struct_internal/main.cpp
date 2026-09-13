@@ -18,6 +18,8 @@ struct point {
     };
 };
 
+static_assert(kon::qi::has_struct_count_range<point::addon_register<>>);
+
 using minfo = kon::qi::reflect_s<point>;
 using addon = minfo::addon_type;
 

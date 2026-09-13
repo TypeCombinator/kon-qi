@@ -19,6 +19,8 @@ struct addon_register<point> {
 
     KON_QI_ADDON_INIT();
 };
+
+static_assert(kon::qi::has_struct_count_range<addon_register<point>>);
 } // namespace kon::qi
 
 using minfo = kon::qi::reflect_s<point>;

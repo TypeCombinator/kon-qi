@@ -23,6 +23,8 @@ struct addon_register<system_error> {
 
     KON_QI_ADDON_INIT();
 };
+
+static_assert(has_enum_value_range<addon_register<system_error>>);
 } // namespace kon::qi
 
 using minfo = kon::qi::reflect_e<system_error>;
