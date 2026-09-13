@@ -24,10 +24,10 @@ struct addon_register<point> {
 using minfo = kon::qi::reflect_s<point>;
 using addon = minfo::addon_type;
 
-using pa_addon = addon::of<minfo::addon_tag_t<0>>;
-static_assert(pa_addon::size() == 2);
-static_assert(pa_addon::get<0>() == 10);
-static_assert(pa_addon::get<1>() == 'X');
+using px_addon = addon::of<minfo::addon_tag_t<0>>;
+static_assert(px_addon::size() == 2);
+static_assert(px_addon::get<0>() == 10);
+static_assert(px_addon::get<1>() == 'X');
 
 using py_addon = addon::of<minfo::addon_tag_t<1>>;
 static_assert(py_addon::size() == 1);
