@@ -247,6 +247,62 @@ using pz_addon = addon::of<minfo::addon_tag_t<2>>;
 static_assert(pz_addon::size() == 0);
 ```
 
+#### Built-in annotations
+
+Some annotations are built-in. Currently, the only built-in annotations are `value_range` and `count_value`.
+
+##### value_range
+
+Enum reflection is implemented by scanning ranges. Most of the time, user-defined enum values fall within a very small range. Sometimes, however, enum values are spread across multiple widely separated ranges. The default scan range is `[-128, 127]`, using the `value_range` annotation, you can specify multiple scan ranges, which can save compile time.
+
+```c++
+#include <kon/qi/enum.hpp>
+
+enum class system_error : int {
+    a,
+    b,
+    c = 1000,
+    d,
+};
+
+namespace kon::qi {
+template <>
+struct addon_register<system_error> {
+    using addon_host_type = system_error;
+    // Specify the scan range.
+    static constexpr int value_range[][2] = {
+        {   0,   10},
+        {1000, 1010},
+    };
+};
+} // namespace kon::qi
+
+using minfo = kon::qi::reflect_e<system_error>;
+
+static_assert(minfo::min() == system_error::a);
+static_assert(minfo::max() == system_error::d);
+```
+
+##### count_range
+
+The number of members in an aggregate type is determined by scanning. The default scan range is `[0, 127]`. As development stabilizes, the number of members in a struct does not change drastically. Although the member scan is optimized using **binary search**, I still recommend using `count_range` to specify the scan range. If you are certain that the member count will not change, for example, 5 members, you can set the scan range to `[5, 5]`. This will save some compilation time.
+
+```c++
+struct point {
+    double x;
+    double y;
+    double z;
+
+    template <typename addon_host_type = point>
+    struct addon_register {
+        // Specify the range of the number of struct members.
+        static constexpr std::size_t count_range[2] = {2, 6};
+    };
+};
+using minfo = kon::qi::reflect_s<point>;
+static_assert(minfo::size() == 3);
+```
+
 ### Others
 
 #### Opinter to member
@@ -294,4 +350,4 @@ cmake -B build/release \
 
 ## Inspiration
 
-The [qlibs/reflect](https://github.com/qlibs/reflect) library provided some inspiration, but it lacks annotation support. Because `kon::qi` implements annotations, its implementation of enum reflection is no longer limited by scan ranges. In addition, this library includes numerous optimizations at the implementation level, minimizing repeated compile-time computations.
+The [qlibs/reflect](https://github.com/qlibs/reflect) library provided some inspiration, but it lacks annotation support. Because `kon::qi` implements annotations, its implementation of enum reflection is no longer limited by scan ranges. In addition, `kon::qi` includes numerous optimizations at the implementation level, minimizing repeated compile-time computations.
