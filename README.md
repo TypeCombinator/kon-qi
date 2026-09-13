@@ -128,6 +128,10 @@ static_assert(ed_addon::size() == 0);
 
 #### Struct with internal annotations
 
+##### Use the default internal annotation
+
+There are two ways to add internal annotations. One is the **default internal annotation**, which requires separation from the member declaration, all annotations are placed in a template class named `addon_register`. 
+
 ```c++
 #include <kon/qi/struct.hpp>
 
@@ -147,6 +151,42 @@ struct point {
 
         KON_QI_ADDON_INIT();
     };
+};
+
+using minfo = kon::qi::reflect_s<point>;
+using addon = minfo::addon_type;
+
+using px_addon = addon::of<minfo::addon_tag_t<0>>;
+static_assert(px_addon::size() == 2);
+static_assert(px_addon::get<0>() == 10);
+static_assert(px_addon::get<1>() == 'X');
+
+using py_addon = addon::of<minfo::addon_tag_t<1>>;
+static_assert(py_addon::size() == 1);
+static_assert(py_addon::get<0>() == 20);
+
+using pz_addon = addon::of<minfo::addon_tag_t<2>>;
+static_assert(pz_addon::size() == 0);
+```
+
+##### Use the default inline annotation
+
+The other is **inline annotation**, which require the CMake option `KON_QI_ENABLE_INLINE_ADDON` to be set to `ON`, in this case, the annotation and the member variable declaration are on the same line.
+
+```c++
+#include <kon/qi/struct.hpp>
+
+struct point {
+    using addon_host_type = point;
+    // Specify the range of the number of struct members.
+    static constexpr std::size_t count_range[2] = {0, 5};
+
+    double KON_QI_IADDON_M(x, 10, 'X');
+    double KON_QI_IADDON_M(y, 20);
+    // No annotation for the z.
+    double z;
+
+    KON_QI_IADDON_INIT();
 };
 
 using minfo = kon::qi::reflect_s<point>;
@@ -231,9 +271,22 @@ static_assert(kon::qi::offset_of(&foo::c) == 8);
 
 ## How to build
 
+### Use the default internal annotation
+
 ```shell
 cmake -B build/release \
 -G Ninja \
+-DKON_QI_BUILD_EXAMPLES=ON \
+-DKON_QI_BUILD_TESTING=ON \
+-DCMAKE_BUILD_TYPE=Release
+```
+
+### Use the default inline annotation
+
+```shell
+cmake -B build/release \
+-G Ninja \
+-DKON_QI_ENABLE_INLINE_ADDON=ON \
 -DKON_QI_BUILD_EXAMPLES=ON \
 -DKON_QI_BUILD_TESTING=ON \
 -DCMAKE_BUILD_TYPE=Release

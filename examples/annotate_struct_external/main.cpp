@@ -26,6 +26,8 @@ static_assert(kon::qi::has_struct_count_range<addon_register<point>>);
 using minfo = kon::qi::reflect_s<point>;
 using addon = minfo::addon_type;
 
+static_assert(kon::qi::has_struct_count_range<addon>);
+
 using px_addon = addon::of<minfo::addon_tag_t<0>>;
 static_assert(px_addon::size() == 2);
 static_assert(px_addon::get<0>() == 10);

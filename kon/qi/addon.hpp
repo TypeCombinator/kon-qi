@@ -6,6 +6,20 @@
 #define ADDON_1A34AF33_3863_4910_984C_743C4E4BD1CD
 #include <kon/qi/pack.hpp>
 
+#if defined(KON_QI_ENABLE_INLINE_ADDON)
+    // Inline addon for the struct member.
+    #define KON_QI_IADDON_M(_m_, ...)                                                              \
+        _m_;                                                                                       \
+        template <typename T>                                                                      \
+        static kon::qi::value_pack<__VA_ARGS__> of_impl(kon::qi::addon_tag<&(CODECL<T>._m_)>)
+
+    #define KON_QI_IADDON_INIT()                                                                   \
+        template <typename T>                                                                      \
+        static kon::qi::value_pack<> of_impl(auto);                                                \
+        template <typename Tag>                                                                    \
+        using of = decltype(of_impl<addon_host_type>(Tag{}))
+#endif
+
 #define KON_QI_ADDON_M(_m_, ...)                                                                   \
     static kon::qi::value_pack<__VA_ARGS__> of_impl(                                               \
         kon::qi::addon_tag<&(CODECL<addon_host_type>._m_)>)
@@ -27,9 +41,12 @@ struct addon_tag { };
 
 template <typename T>
 struct addon_register {
+    // No annotation by default.
     KON_QI_ADDON_INIT();
-    // Empty addon.
 };
+
+template <typename T>
+concept has_inline_addon = requires() { typename T::addon_host_type; };
 
 template <typename T>
 concept has_internal_addon = requires() { typename T::template addon_register<>; };

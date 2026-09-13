@@ -157,9 +157,16 @@ struct reflect_s {
     // TODO: Remove this help function, This doesn't apply to types that can't be evaluated at
     // compile time.
     static consteval auto addon() noexcept {
+#if defined(KON_QI_ENABLE_INLINE_ADDON)
+        if constexpr (requires() { typename T::addon_host_type; }) {
+            return T{};
+        }
+#else
         if constexpr (requires() { typename T::template addon_register<>; }) {
             return typename T::template addon_register<>{};
-        } else if constexpr (requires() { typename addon_register<T>::addon_host_type; }) {
+        }
+#endif
+        else if constexpr (requires() { typename addon_register<T>::addon_host_type; }) {
             return addon_register<T>{};
         } else {
             return addon_register<void>{};
