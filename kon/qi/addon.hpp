@@ -1,6 +1,7 @@
-// SPDX-FileCopyrightText: 2026 TypeCombinator <typecombinator@foxmail.com>
+// Copyright (c) 2026 TypeCombinator <typecombinator@foxmail.com>
 //
-// SPDX-License-Identifier: BSD 3-Clause
+// Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt
+// or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef ADDON_1A34AF33_3863_4910_984C_743C4E4BD1CD
 #define ADDON_1A34AF33_3863_4910_984C_743C4E4BD1CD

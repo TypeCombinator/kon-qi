@@ -1,6 +1,10 @@
-# `kon::qi`: A Previous Generation Static Reflection Library for C++
+[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
+[![C++](https://img.shields.io/badge/C%2B%2B-20%2B-blue.svg)](https://en.cppreference.com/w/cpp/compiler_support)
+[![License: BSL-1.0](https://img.shields.io/badge/License-Boost_1.0-lightblue.svg)](https://opensource.org/license/BSL-1.0)
 
-`kon::qi` is a header-only static reflection library for C++20 with **annotation** support. 
+# `kon::qi`: A Last Generation Static Reflection Library for C++
+
+`kon::qi` is a header-only static reflection library for C++20 with **annotation** support. Yes, this isn’t next-gen, nor next-next-gen, it’s last-gen.
 
 ## Features
 
@@ -370,7 +374,7 @@ set(KON_QI_ENABLE_INLINE_ADDON OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     kon-qi
     GIT_REPOSITORY https://github.com/TypeCombinator/kon-qi.git
-    GIT_TAG        4e4b107c04e037220f57ca9dd988cb7c731f3bc9
+    GIT_TAG        636409a1a22b35b75b6e0b956ffddfda529c6e16
 )
 FetchContent_MakeAvailable(kon-qi)
 ```
