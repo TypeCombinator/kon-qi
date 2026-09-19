@@ -40,11 +40,12 @@ consteval std::size_t member_count() noexcept {
 
     constexpr std::size_t Middle = (Start + End) >> 1;
     constexpr int r = []<std::size_t... Ns>(index_sequence<Ns...>) {
-        if constexpr (not requires { T{cure_all<Ns>{}...}; }) {
+        constexpr bool le = requires { T{cure_all<Ns>{}...}; };
+        if constexpr (!le) {
             return 1;
-        } else if constexpr (
-            requires { T{cure_all<Ns>{}...}; }
-            and not requires { T{cure_all<Ns>{}..., cure_all<Middle + 1>{}}; }) {
+        } else if constexpr (le and not requires {
+                                 T{cure_all<Ns>{}..., cure_all<Middle + 1>{}};
+                             }) {
             return 0;
         } else {
             return -1;
