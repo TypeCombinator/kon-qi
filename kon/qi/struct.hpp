@@ -134,18 +134,24 @@ consteval struct_information<N> make_struct_information() noexcept {
         }
     };
 
+    // Although there exist algorithms with lower worst-case complexity, considering that this is a
+    // compile-time computation, the code should remain simple, and performance in most scenarios
+    // should be prioritized.
     detail::mvisit_as_nttp<CODECL<U>.t>(size_constant<N>{}, [&info]<auto... Ms>() {
         const unsigned char* init = CODECL<U>.buffer;
         const void* targets[N] = {Ms...};
         std::size_t msizes[N] = {sizeof(*Ms)...};
-        std::size_t offset = 0;
+        const unsigned char* cur = init;
         for (std::size_t i{}; i < N; i++) {
             const void* target = targets[i];
-            while ((init + offset) < target) {
-                offset++;
+            while (cur < target) {
+                cur += 4;
             }
-            info.m_offsets[i] = offset;
-            offset += (msizes[i] & (~std::size_t{1}));
+            while (cur > target) {
+                cur--;
+            }
+            info.m_offsets[i] = cur - init;
+            cur += msizes[i];
         }
     });
     return info;

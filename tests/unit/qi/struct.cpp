@@ -21,8 +21,7 @@ static_assert(kon::qi::member_count<s_foo3>() == 3);
 static_assert(kon::qi::member_count<s_foo3, 0, 4>() == 3);
 
 // The parameter `End` must be greater than the number of elements
-// static constexpr std::size_t r =  kon::qi::member_count<s_foo3, 0, 3>();
-
+// static constexpr std::size_t r = kon::qi::member_count<s_foo3, 0, 3>();
 
 struct s_foo_cvref {
     int a;
@@ -56,6 +55,41 @@ static_assert(s_foo3_minfo::member_offset<2>() == kon::qi::offset_of(&s_foo3::c)
 static_assert(std::is_same_v<s_foo3_minfo::member_type<0>, int>);
 static_assert(std::is_same_v<s_foo3_minfo::member_type<1>, char>);
 static_assert(std::is_same_v<s_foo3_minfo::member_type<2>, double>);
+
+class tp_member {
+    int a;
+    char b;
+};
+
+struct empty_member0 { };
+
+struct empty_member1 { };
+
+static_assert(sizeof(tp_member) == 8);
+
+struct s_foo_overlap {
+    [[no_unique_address]]
+    tp_member a;
+    [[no_unique_address]]
+    char b;
+    [[no_unique_address]]
+    empty_member0 c;
+    [[no_unique_address]]
+    empty_member1 d;
+};
+
+static_assert(sizeof(s_foo_overlap) == 8);
+
+consteval bool s_foo_overlap_test() noexcept {
+    using minfo = kon::qi::reflect_s<s_foo_overlap>;
+    static_assert(minfo::size() == 4);
+    static_assert(minfo::member_offset<0>() == 0);
+    static_assert(minfo::member_offset<1>() == 5);
+    static_assert(minfo::member_offset<2>() == 0);
+    static_assert(minfo::member_offset<3>() == 0);
+    return true;
+}
+
 } // namespace qi_struct_test
 
 using namespace qi_struct_test;
