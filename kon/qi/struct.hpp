@@ -40,11 +40,12 @@ consteval std::size_t member_count() noexcept {
 
     constexpr std::size_t Middle = (Start + End) >> 1;
     constexpr int r = []<std::size_t... Ns>(index_sequence<Ns...>) {
-        if constexpr (not requires { T{cure_all<Ns>{}...}; }) {
+        constexpr bool le = requires { T{cure_all<Ns>{}...}; };
+        if constexpr (!le) {
             return 1;
-        } else if constexpr (
-            requires { T{cure_all<Ns>{}...}; }
-            and not requires { T{cure_all<Ns>{}..., cure_all<Middle + 1>{}}; }) {
+        } else if constexpr (le and not requires {
+                                 T{cure_all<Ns>{}..., cure_all<Middle + 1>{}};
+                             }) {
             return 0;
         } else {
             return -1;
@@ -106,21 +107,18 @@ constexpr decltype(auto) mvisit(size_constant<0>, T&& obj, auto&& fun) noexcept 
 } // namespace detail
 
 template <std::size_t N>
-struct struct_information {
-    std::string_view m_names[N];
-    // TODO: Defer computation until use.
-    std::size_t m_offsets[N];
+struct struct_member_names {
+    std::string_view m_data[N];
+};
+
+template <std::size_t N>
+struct struct_member_offsets {
+    std::size_t m_data[N];
 };
 
 template <std::size_t N, typename T>
-consteval struct_information<N> make_struct_information() noexcept {
-    struct_information<N> info;
-    detail::mvisit_as_nttp<CODECL<T>>(size_constant<N>{}, [&info]<auto... Ms>() {
-        std::string_view names[N] = {detail::member_name<Ms>()...};
-        for (std::size_t i{}; i < N; i++) {
-            info.m_names[i] = names[i];
-        }
-    });
+consteval struct_member_offsets<N> make_struct_member_offsets() noexcept {
+    struct_member_offsets<N> offsets;
 
     union U {
         unsigned char buffer[sizeof(T)];
@@ -133,21 +131,27 @@ consteval struct_information<N> make_struct_information() noexcept {
         }
     };
 
-    detail::mvisit_as_nttp<CODECL<U>.t>(size_constant<N>{}, [&info]<auto... Ms>() {
+    // Although there exist algorithms with lower worst-case complexity, considering that this is a
+    // compile-time computation, the code should remain simple, and performance in most scenarios
+    // should be prioritized.
+    detail::mvisit_as_nttp<CODECL<U>.t>(size_constant<N>{}, [&offsets]<auto... Ms>() {
         const unsigned char* init = CODECL<U>.buffer;
         const void* targets[N] = {Ms...};
         std::size_t msizes[N] = {sizeof(*Ms)...};
-        std::size_t offset = 0;
+        const unsigned char* cur = init;
         for (std::size_t i{}; i < N; i++) {
             const void* target = targets[i];
-            while ((init + offset) < target) {
-                offset++;
+            while (cur < target) {
+                cur += 4;
             }
-            info.m_offsets[i] = offset;
-            offset += (msizes[i] & (~std::size_t{1}));
+            while (cur > target) {
+                cur--;
+            }
+            offsets.m_data[i] = cur - init;
+            cur += msizes[i];
         }
     });
-    return info;
+    return offsets;
 }
 
 template <typename T>
@@ -201,8 +205,15 @@ struct reflect_s {
         detail::mvisit_as_nttp<CODECL<T>>(size_constant<sm_size>{}, []<auto... Vs>() {
             return kon::qi::value_pack<Vs...>{};
         });
-    // TODO: Generate information from sm_maddrs.
-    static constexpr auto sm_info = make_struct_information<sm_size, T>();
+
+    // Member names.
+    static constexpr struct_member_names<sm_size> sm_mnames = sm_maddrs.visit([]<auto... Ms>() {
+        return struct_member_names<sm_size>{detail::member_name<Ms>()...};
+    });
+
+    // Member offsets.
+    static constexpr struct_member_offsets<sm_size> sm_moffsets =
+        make_struct_member_offsets<sm_size, T>();
 
     static consteval std::size_t size() noexcept {
         return sm_size;
@@ -210,20 +221,20 @@ struct reflect_s {
 
     template <std::size_t I>
     static consteval std::string_view member_name() noexcept {
-        return sm_info.m_names[I];
+        return sm_mnames.m_data[I];
     }
 
     static constexpr std::string_view member_name(std::size_t I) noexcept {
-        return sm_info.m_names[I];
+        return sm_mnames.m_data[I];
     }
 
     template <std::size_t I>
     static consteval std::size_t member_offset() noexcept {
-        return sm_info.m_offsets[I];
+        return sm_moffsets.m_data[I];
     }
 
     static constexpr std::size_t member_offset(std::size_t I) noexcept {
-        return sm_info.m_offsets[I];
+        return sm_moffsets.m_data[I];
     }
 
     template <std::size_t I>

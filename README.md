@@ -1,6 +1,6 @@
-# `kon::qi`
+# `kon::qi`: A Previous Generation Static Reflection Library for C++
 
-`kon::qi` is header-only reflection library for C++20 with **annotation** support.
+`kon::qi` is a header-only static reflection library for C++20 with **annotation** support. 
 
 ## Features
 
