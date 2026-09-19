@@ -55,7 +55,7 @@ struct value_pack {
     }
 
     static consteval auto visit(auto &&fun) noexcept {
-        static_cast<decltype(fun) &&>(fun).template operator()<Vs...>();
+        return static_cast<decltype(fun) &&>(fun).template operator()<Vs...>();
     }
 };
 } // namespace qi

@@ -108,20 +108,18 @@ constexpr decltype(auto) mvisit(size_constant<0>, T&& obj, auto&& fun) noexcept 
 
 template <std::size_t N>
 struct struct_information {
-    std::string_view m_names[N];
     // TODO: Defer computation until use.
     std::size_t m_offsets[N];
+};
+
+template <std::size_t N>
+struct struct_member_names {
+    std::string_view m_data[N];
 };
 
 template <std::size_t N, typename T>
 consteval struct_information<N> make_struct_information() noexcept {
     struct_information<N> info;
-    detail::mvisit_as_nttp<CODECL<T>>(size_constant<N>{}, [&info]<auto... Ms>() {
-        std::string_view names[N] = {detail::member_name<Ms>()...};
-        for (std::size_t i{}; i < N; i++) {
-            info.m_names[i] = names[i];
-        }
-    });
 
     union U {
         unsigned char buffer[sizeof(T)];
@@ -208,6 +206,12 @@ struct reflect_s {
         detail::mvisit_as_nttp<CODECL<T>>(size_constant<sm_size>{}, []<auto... Vs>() {
             return kon::qi::value_pack<Vs...>{};
         });
+
+    // Member names.
+    static constexpr struct_member_names<sm_size> sm_mnames = sm_maddrs.visit([]<auto... Ms>() {
+        return struct_member_names<sm_size>{detail::member_name<Ms>()...};
+    });
+
     // TODO: Generate information from sm_maddrs.
     static constexpr auto sm_info = make_struct_information<sm_size, T>();
 
@@ -217,11 +221,11 @@ struct reflect_s {
 
     template <std::size_t I>
     static consteval std::string_view member_name() noexcept {
-        return sm_info.m_names[I];
+        return sm_mnames.m_data[I];
     }
 
     static constexpr std::string_view member_name(std::size_t I) noexcept {
-        return sm_info.m_names[I];
+        return sm_mnames.m_data[I];
     }
 
     template <std::size_t I>
