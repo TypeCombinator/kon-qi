@@ -18,7 +18,6 @@ struct enum_information {
     std::size_t m_size;
     bool m_is_continuous;
     utype m_values[N];
-    utype m_min, m_max;
     std::string_view m_names[N];
     std::string_view m_pretty_prefix;
 
@@ -34,14 +33,12 @@ struct enum_information {
         for (std::size_t i{}; i < s; i++) {
             r.m_names[i] = m_names[i];
         }
-        r.m_min = m_min;
-        r.m_max = m_max;
         r.m_pretty_prefix = m_pretty_prefix;
         return r;
     }
 };
 
-constexpr int default_enum_value_range[1][2] = {
+inline constexpr int default_enum_value_range[1][2] = {
     {-128, 127}
 };
 
@@ -97,23 +94,19 @@ consteval enum_information<TotalSpace, ET> make_enum_information_impl() noexcept
         (enum_information_maker<ET, ValueRanges[Is][0], ValueRanges[Is][1]>::make(enum_info, prefix),
          ...);
         std::size_t size = enum_info.m_size;
-        if (size > 0) {
-            enum_info.m_min = enum_info.m_values[0];
-            enum_info.m_max = enum_info.m_values[size - 1];
-            if constexpr (VRN == 1) {
-                bool is_continuous = true;
-                auto prev = enum_info.m_values[0];
-                auto cur = prev;
-                for (std::size_t i{1}; i < size; i++) {
-                    cur = enum_info.m_values[i];
-                    if (prev + 1 != cur) {
-                        is_continuous = false;
-                        break;
-                    }
-                    prev = cur;
+        if constexpr (VRN == 1) {
+            bool is_continuous = true;
+            auto prev = enum_info.m_values[0];
+            auto cur = prev;
+            for (std::size_t i{1}; i < size; i++) {
+                cur = enum_info.m_values[i];
+                if (prev + 1 != cur) {
+                    is_continuous = false;
+                    break;
                 }
-                enum_info.m_is_continuous = is_continuous;
+                prev = cur;
             }
+            enum_info.m_is_continuous = is_continuous;
         }
         enum_info.m_pretty_prefix = prefix;
     }(make_index_sequence<VRN>{});
@@ -170,11 +163,11 @@ struct reflect_e {
     }
 
     static consteval ET min() noexcept {
-        return static_cast<ET>(sm_info.m_min);
+        return static_cast<ET>(sm_info.m_values[0]);
     }
 
     static consteval ET max() noexcept {
-        return static_cast<ET>(sm_info.m_max);
+        return static_cast<ET>(sm_info.m_values[size() - 1]);
     }
 
     static consteval std::string_view pretty_name_prefix() noexcept {
@@ -184,8 +177,8 @@ struct reflect_e {
     static constexpr std::string_view to_name(ET value, std::string_view invalid = {}) noexcept {
         utype uv = static_cast<utype>(value);
         if constexpr (is_continuous()) {
-            constexpr utype min_uv = sm_info.m_min;
-            if ((min_uv <= uv) && (uv <= sm_info.m_max)) [[likely]] {
+            constexpr utype min_uv = sm_info.m_values[0];
+            if ((min_uv <= uv) && (uv <= sm_info.m_values[size() - 1])) [[likely]] {
                 return sm_info.m_names[uv - min_uv];
             }
         } else {

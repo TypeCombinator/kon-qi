@@ -6,10 +6,11 @@
 #include <kon/qi/enum.hpp>
 
 namespace qi_enum_test {
+// An empty enum type.
 enum class e_foo0 {
 };
 using e_foo0_infos = kon::qi::reflect_e<e_foo0>;
-static_assert(!e_foo0_infos::is_continuous());
+static_assert(e_foo0_infos::is_continuous());
 static_assert(e_foo0_infos::size() == 0);
 
 enum class e_foo {
