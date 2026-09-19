@@ -214,11 +214,6 @@ struct reflect_e {
     static constexpr ET to_value_from_rank(std::size_t rank) noexcept {
         return static_cast<ET>(sm_info.m_values[rank]);
     }
-
-    template <ET e>
-    static consteval auto addon_tag() noexcept {
-        return kon::qi::addon_tag<e>{};
-    }
 };
 } // namespace qi
 } // namespace kon
