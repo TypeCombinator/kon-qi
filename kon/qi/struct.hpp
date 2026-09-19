@@ -107,19 +107,18 @@ constexpr decltype(auto) mvisit(size_constant<0>, T&& obj, auto&& fun) noexcept 
 } // namespace detail
 
 template <std::size_t N>
-struct struct_information {
-    // TODO: Defer computation until use.
-    std::size_t m_offsets[N];
-};
-
-template <std::size_t N>
 struct struct_member_names {
     std::string_view m_data[N];
 };
 
+template <std::size_t N>
+struct struct_member_offsets {
+    std::size_t m_data[N];
+};
+
 template <std::size_t N, typename T>
-consteval struct_information<N> make_struct_information() noexcept {
-    struct_information<N> info;
+consteval struct_member_offsets<N> make_struct_member_offsets() noexcept {
+    struct_member_offsets<N> offsets;
 
     union U {
         unsigned char buffer[sizeof(T)];
@@ -135,7 +134,7 @@ consteval struct_information<N> make_struct_information() noexcept {
     // Although there exist algorithms with lower worst-case complexity, considering that this is a
     // compile-time computation, the code should remain simple, and performance in most scenarios
     // should be prioritized.
-    detail::mvisit_as_nttp<CODECL<U>.t>(size_constant<N>{}, [&info]<auto... Ms>() {
+    detail::mvisit_as_nttp<CODECL<U>.t>(size_constant<N>{}, [&offsets]<auto... Ms>() {
         const unsigned char* init = CODECL<U>.buffer;
         const void* targets[N] = {Ms...};
         std::size_t msizes[N] = {sizeof(*Ms)...};
@@ -148,11 +147,11 @@ consteval struct_information<N> make_struct_information() noexcept {
             while (cur > target) {
                 cur--;
             }
-            info.m_offsets[i] = cur - init;
+            offsets.m_data[i] = cur - init;
             cur += msizes[i];
         }
     });
-    return info;
+    return offsets;
 }
 
 template <typename T>
@@ -212,8 +211,9 @@ struct reflect_s {
         return struct_member_names<sm_size>{detail::member_name<Ms>()...};
     });
 
-    // TODO: Generate information from sm_maddrs.
-    static constexpr auto sm_info = make_struct_information<sm_size, T>();
+    // Member offsets.
+    static constexpr struct_member_offsets<sm_size> sm_moffsets =
+        make_struct_member_offsets<sm_size, T>();
 
     static consteval std::size_t size() noexcept {
         return sm_size;
@@ -230,11 +230,11 @@ struct reflect_s {
 
     template <std::size_t I>
     static consteval std::size_t member_offset() noexcept {
-        return sm_info.m_offsets[I];
+        return sm_moffsets.m_data[I];
     }
 
     static constexpr std::size_t member_offset(std::size_t I) noexcept {
-        return sm_info.m_offsets[I];
+        return sm_moffsets.m_data[I];
     }
 
     template <std::size_t I>
