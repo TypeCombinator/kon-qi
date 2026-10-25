@@ -64,7 +64,8 @@ consteval std::size_t member_count() noexcept {
 
 namespace detail {
 struct member_guider {
-    static constexpr std::string_view fname{fun_str_nttp<&CODECL<SDECL>.Z>()};
+    static constexpr const void* mpointer = &CODECL<SDECL>.Z;
+    static constexpr std::string_view fname{fun_str_nttp<mpointer>()};
     static constexpr std::size_t offset = fname.rfind('Z');
     static constexpr std::string_view prefix{fname.data() + offset - 2, 2};
     static constexpr std::size_t rgarbage = fname.size() - (offset + 1);
@@ -109,12 +110,12 @@ constexpr decltype(auto) mvisit(size_constant<0>, T&& obj, auto&& fun) noexcept 
 
 template <std::size_t N>
 struct struct_member_names {
-    std::string_view m_data[N];
+    std::string_view m_data[N + 1];
 };
 
 template <std::size_t N>
 struct struct_member_offsets {
-    std::size_t m_data[N];
+    std::size_t m_data[N + 1];
 };
 
 template <std::size_t N, typename T>
@@ -132,13 +133,14 @@ consteval struct_member_offsets<N> make_struct_member_offsets() noexcept {
         }
     };
 
+    std::size_t* offset = offsets.m_data;
     // Although there exist algorithms with lower worst-case complexity, considering that this is a
     // compile-time computation, the code should remain simple, and performance in most scenarios
     // should be prioritized.
-    detail::mvisit_as_nttp<CODECL<U>.t>(size_constant<N>{}, [&offsets]<auto... Ms>() {
+    detail::mvisit(size_constant<N>{}, CODECL<U>.t, [offset](auto&&... ms) mutable {
         const unsigned char* init = CODECL<U>.buffer;
-        const void* targets[N] = {Ms...};
-        std::size_t msizes[N] = {sizeof(*Ms)...};
+        const void* targets[N + 1] = {&ms..., nullptr};
+        std::size_t msizes[N + 1] = {sizeof(ms)..., 0};
         const unsigned char* cur = init;
         for (std::size_t i{}; i < N; i++) {
             const void* target = targets[i];
@@ -148,12 +150,18 @@ consteval struct_member_offsets<N> make_struct_member_offsets() noexcept {
             while (cur > target) {
                 cur--;
             }
-            offsets.m_data[i] = cur - init;
+            *offset++ = cur - init;
             cur += msizes[i];
         }
+        *offset = -1;
     });
     return offsets;
 }
+
+template <std::size_t N>
+struct maddr_array {
+    const void* m_data[N + 1];
+};
 
 template <typename T>
 struct reflect_s {
@@ -185,7 +193,7 @@ struct reflect_s {
     using addon_type = decltype(addon());
 #endif
 
-    static consteval auto member_count_select() noexcept {
+    static consteval std::size_t member_count_select() noexcept {
         if constexpr (requires() { addon_type::count_range; }) {
             using cr_type = std::remove_reference_t<decltype(addon_type::count_range)>;
             static_assert(std::rank_v<cr_type> == 1);
@@ -203,14 +211,15 @@ struct reflect_s {
 
     // Member addresses.
     static constexpr auto sm_maddrs =
-        detail::mvisit_as_nttp<CODECL<T>>(size_constant<sm_size>{}, []<auto... Vs>() {
-            return kon::qi::value_pack<Vs...>{};
+        detail::mvisit(size_constant<sm_size>{}, CODECL<T>, [](auto&&... args) {
+            return maddr_array<sm_size>{&args..., nullptr};
         });
 
     // Member names.
-    static constexpr struct_member_names<sm_size> sm_mnames = sm_maddrs.visit([]<auto... Ms>() {
-        return struct_member_names<sm_size>{detail::member_name<Ms>()...};
-    });
+    static constexpr struct_member_names<sm_size> sm_mnames =
+        []<auto... Is>(index_sequence<Is...>) {
+            return struct_member_names<sm_size>{detail::member_name<sm_maddrs.m_data[Is]>()..., ""};
+        }(make_index_sequence<sm_size>{});
 
     // Member offsets.
     static constexpr struct_member_offsets<sm_size> sm_moffsets =
@@ -244,7 +253,7 @@ struct reflect_s {
     }
 
     template <std::size_t I>
-    using member_type = std::remove_cvref_t<decltype(*sm_maddrs.template get<I>())>;
+    using member_type = std::remove_cvref_t<decltype(member_get<I>(std::declval<T>()))>;
 
     static void foreach(auto&& fun) {
         [&]<auto... Is>(index_sequence<Is...>) {
@@ -253,7 +262,7 @@ struct reflect_s {
     }
 
     template <std::size_t I>
-    using addon_tag_t = kon::qi::addon_tag<sm_maddrs.template get<I>()>;
+    using addon_tag_t = kon::qi::addon_tag<sm_maddrs.m_data[I]>;
 };
 
 } // namespace qi

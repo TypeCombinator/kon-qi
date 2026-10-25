@@ -49,6 +49,7 @@ using s_foo0_minfo = kon::qi::reflect_s<qi_struct_test::s_foo0>;
 static_assert(s_foo0_minfo::size() == 0);
 
 using s_foo3_minfo = kon::qi::reflect_s<qi_struct_test::s_foo3>;
+static_assert(s_foo3_minfo::size() == 3);
 static_assert(s_foo3_minfo::member_name<0>() == std::string_view{"a"});
 static_assert(s_foo3_minfo::member_name<1>() == std::string_view{"b"});
 static_assert(s_foo3_minfo::member_name<2>() == std::string_view{"c"});
@@ -72,15 +73,20 @@ struct empty_member1 { };
 
 static_assert(sizeof(tp_member) == 8);
 
+
+// TODO: Move the attribute definition into a header file.
+#if defined(__has_cpp_attribute) && __has_cpp_attribute(msvc::no_unique_address)
+    #define KON_QI_ATTR_NO_UNIQUE_ADDRESS [[msvc::no_unique_address]]
+#else
+    #define KON_QI_ATTR_NO_UNIQUE_ADDRESS [[no_unique_address]]
+#endif
+
+#if not defined(_MSC_VER) || defined(__clang__)
 struct s_foo_overlap {
-    [[no_unique_address]]
-    tp_member a;
-    [[no_unique_address]]
-    char b;
-    [[no_unique_address]]
-    empty_member0 c;
-    [[no_unique_address]]
-    empty_member1 d;
+    KON_QI_ATTR_NO_UNIQUE_ADDRESS tp_member a;
+    KON_QI_ATTR_NO_UNIQUE_ADDRESS char b;
+    KON_QI_ATTR_NO_UNIQUE_ADDRESS empty_member0 c;
+    KON_QI_ATTR_NO_UNIQUE_ADDRESS empty_member1 d;
 };
 
 static_assert(sizeof(s_foo_overlap) == 8);
@@ -94,7 +100,7 @@ consteval bool s_foo_overlap_test() noexcept {
     static_assert(minfo::member_offset<3>() == 0);
     return true;
 }
-
+#endif
 } // namespace qi_struct_test
 
 using namespace qi_struct_test;
