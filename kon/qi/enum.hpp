@@ -17,8 +17,8 @@ struct enum_information {
 
     std::size_t m_size;
     bool m_is_continuous;
-    utype m_values[N];
-    std::string_view m_names[N];
+    utype m_values[N + 1];
+    std::string_view m_names[N + 1];
     std::string_view m_pretty_prefix;
 
     template <std::size_t SN>
@@ -27,10 +27,10 @@ struct enum_information {
         std::size_t s = m_size;
         r.m_size = s;
         r.m_is_continuous = m_is_continuous;
-        for (std::size_t i{}; i < s; i++) {
+        for (std::size_t i{}; i <= s; i++) {
             r.m_values[i] = m_values[i];
         }
-        for (std::size_t i{}; i < s; i++) {
+        for (std::size_t i{}; i <= s; i++) {
             r.m_names[i] = m_names[i];
         }
         r.m_pretty_prefix = m_pretty_prefix;
@@ -60,7 +60,7 @@ struct enum_information_maker {
     static constexpr std::size_t space = MaxEv - MinEv + 1;
 
     template <auto... Ns>
-    static consteval void
+    static constexpr void
         make_impl(auto& enum_info, std::string_view& prefix, index_sequence<Ns...>) noexcept {
         constexpr std::string_view pnames[] = {pretty_value_name<static_cast<ET>(MinEv + Ns)>()...};
 
@@ -80,7 +80,7 @@ struct enum_information_maker {
         enum_info.m_size = size;
     }
 
-    static consteval void make(auto& enum_infos, std::string_view& prefix) noexcept {
+    static constexpr void make(auto& enum_infos, std::string_view& prefix) noexcept {
         make_impl(enum_infos, prefix, make_index_sequence<space>{});
     }
 };
@@ -88,10 +88,9 @@ struct enum_information_maker {
 template <typename ET, std::size_t TotalSpace, auto& ValueRanges, std::size_t VRN>
 consteval enum_information<TotalSpace, ET> make_enum_information_impl() noexcept {
     enum_information<TotalSpace, ET> enum_info{};
-
     [&enum_info]<auto... Is>(index_sequence<Is...>) {
-        std::string_view prefix{};
-        (enum_information_maker<ET, ValueRanges[Is][0], ValueRanges[Is][1]>::make(enum_info, prefix),
+        (enum_information_maker<ET, ValueRanges[Is][0], ValueRanges[Is][1]>::make(
+             enum_info, enum_info.m_pretty_prefix),
          ...);
         std::size_t size = enum_info.m_size;
         if constexpr (VRN == 1) {
@@ -108,7 +107,6 @@ consteval enum_information<TotalSpace, ET> make_enum_information_impl() noexcept
             }
             enum_info.m_is_continuous = is_continuous;
         }
-        enum_info.m_pretty_prefix = prefix;
     }(make_index_sequence<VRN>{});
     return enum_info;
 }

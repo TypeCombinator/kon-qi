@@ -7,7 +7,7 @@
 #define PACK_18471EA5_EC9B_4807_9CE6_3F6C9FD9DD4F
 #include <cstddef>
 
-#define KON_QI_FFWD1(_arg_) static_cast<decltype(_arg_) &&>(_arg_)
+#define KON_QI_FFWD1(_arg_) static_cast<decltype(_arg_)&&>(_arg_)
 
 namespace kon {
 //
@@ -33,13 +33,13 @@ struct size_constant {
 
 template <auto...>
 struct black_hole {
-    constexpr black_hole(auto &&...) noexcept {
+    constexpr black_hole(auto&&...) noexcept {
     }
 };
 
 template <std::size_t N>
 constexpr auto value_pack_element = []<auto... Ns>(index_sequence<Ns...>) -> decltype(auto) {
-    return [](black_hole<Ns> &&..., auto &&nth, auto &&...) -> decltype(auto) {
+    return [](black_hole<Ns>&&..., auto&& nth, auto&&...) -> decltype(auto) {
         return KON_QI_FFWD1(nth);
     };
 }(make_index_sequence<N>{});
@@ -55,8 +55,8 @@ struct value_pack {
         return value_pack_element<I>(Vs...);
     }
 
-    static consteval auto visit(auto &&fun) noexcept {
-        return static_cast<decltype(fun) &&>(fun).template operator()<Vs...>();
+    static constexpr auto visit(auto&& fun) noexcept {
+        return static_cast<decltype(fun)&&>(fun).template operator()<Vs...>();
     }
 };
 } // namespace qi

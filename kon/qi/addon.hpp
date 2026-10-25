@@ -9,30 +9,52 @@
 
 #if defined(KON_QI_ENABLE_INLINE_ADDON)
     // Inline addon for the struct member.
-    #define KON_QI_IADDON_M(_m_, ...)                                                              \
-        _m_;                                                                                       \
-        template <typename T>                                                                      \
-        static kon::qi::value_pack<__VA_ARGS__> of_impl(kon::qi::addon_tag<&(CODECL<T>._m_)>)
+    #if _MSC_VER && not defined(__clang__)
+template <auto V>
+struct value_identity {
+    static constexpr auto value = V;
+};
+
+        #define KON_QI_IADDON_M(_m_, ...)                                                          \
+            _m_;                                                                                   \
+            template <typename AHT>                                                                \
+            static kon::qi::value_pack<__VA_ARGS__> of_impl(                                       \
+                kon::qi::addon_tag<static_cast<const void *>(                                      \
+                    value_identity<&(CODECL<AHT>._m_)>::value)>)
+    #else
+        #define KON_QI_IADDON_M(_m_, ...)                                                          \
+            _m_;                                                                                   \
+            template <typename AHT>                                                                \
+            static kon::qi::value_pack<__VA_ARGS__> of_impl(                                       \
+                kon::qi::addon_tag<static_cast<const void *>(&(CODECL<AHT>._m_))>)
+    #endif
 
     #define KON_QI_IADDON_INIT()                                                                   \
-        template <typename T>                                                                      \
+        template <typename AHT>                                                                    \
         static kon::qi::value_pack<> of_impl(auto);                                                \
-        template <typename Tag>                                                                    \
-        using of = decltype(of_impl<addon_host_type>(Tag{}))
+        template <typename AddonTag>                                                               \
+        using of = decltype(of_impl<addon_host_type>(AddonTag{}))
 #endif
 
-#define KON_QI_ADDON_M(_m_, ...)                                                                   \
-    static kon::qi::value_pack<__VA_ARGS__> of_impl(                                               \
-        kon::qi::addon_tag<&(CODECL<addon_host_type>._m_)>)
+#if _MSC_VER && not defined(__clang__)
+    #define KON_QI_ADDON_M(_m_, ...)                                                               \
+        static constexpr auto __mptr_##_m_ = &CODECL<addon_host_type>._m_;                         \
+        static kon::qi::value_pack<__VA_ARGS__> of_impl(                                           \
+            kon::qi::addon_tag<static_cast<const void *>(__mptr_##_m_)>)
+#else
+    #define KON_QI_ADDON_M(_m_, ...)                                                               \
+        static kon::qi::value_pack<__VA_ARGS__> of_impl(                                           \
+            kon::qi::addon_tag<static_cast<const void *>(&(CODECL<addon_host_type>._m_))>)
+#endif
 
 #define KON_QI_ADDON_E(_e_, ...)                                                                   \
     static kon::qi::value_pack<__VA_ARGS__> of_impl(kon::qi::addon_tag<addon_host_type::_e_>)
 
 #define KON_QI_ADDON_INIT()                                                                        \
-    template <auto maddr>                                                                          \
-    static kon::qi::value_pack<> of_impl(kon::qi::addon_tag<maddr>);                               \
-    template <typename Tag>                                                                        \
-    using of = decltype(of_impl(Tag{}))
+    template <auto MAddr>                                                                          \
+    static kon::qi::value_pack<> of_impl(kon::qi::addon_tag<MAddr>);                               \
+    template <typename AddonTag>                                                                   \
+    using of = decltype(of_impl(AddonTag{}))
 
 namespace kon {
 //
