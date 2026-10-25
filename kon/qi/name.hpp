@@ -66,7 +66,7 @@ consteval std::string_view pretty_value_name() noexcept {
     return {n.data() + value_guider::offset, n.size() - value_guider::garbage};
 }
 
-consteval std::string_view pretty_name_prefix(std::string_view v) noexcept {
+constexpr std::string_view pretty_name_prefix(std::string_view v) noexcept {
     std::size_t offset = v.rfind("::");
     if (offset != std::string_view::npos) {
         return std::string_view{v.data(), offset + 2};
