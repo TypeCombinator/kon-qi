@@ -7,14 +7,15 @@
 
 # `kon::qi`: A Last Generation Static Reflection Library for C++
 
-`kon::qi` is a header-only static reflection library for C++20 with **annotation** support. Yes, this isn’t next-gen, nor next-next-gen, it’s last-gen.
+`kon::qi` is a header-only static reflection library for C++20 with **annotation** support. This isn’t next-gen, nor next-next-gen, it’s last-gen.
 
 ## Features
 
 - **Annotations**: Attach arbitrary compile-time metadata to enum and struct, just like C++26.
-- **Enum reflection with multi-interval scanning**: Declare any number of disjoint value ranges to scan, so sparse enums cost almost no extra compile time.
-- **Optimized aggregate member count scanning**: Use _binary search_ for scanning, and support scanning within a specified interval.
+- **Enum reflection with multi-range scanning**: Declare any number of disjoint value ranges to scan, so sparse enums cost almost no extra compile time.
+- **Optimized aggregate member count scanning**: Use _binary search_ for scanning, and support scanning within a specified range.
 - **Near-zero dependencies**: Only depends on the standard library's `<string_view>`, no `<array>`, no `<tuple>`!
+- **Support multiple compilers**: Tested on GCC, Clang, MSVC, and Clang-CL.
 - **Only a few macros**: Macros are only needed when annotations are required, and these macros are only intended to reduce boilerplate code, so they are not mandatory either.
 
 ## Examples
@@ -314,11 +315,11 @@ static_assert(minfo::size() == 3);
 
 - An instantiated `addon_register` must be constructible at compile time.
 - Whenever annotations are used, `addon_host_type` must be declared.
-- Declared intervals are unified as closed intervals.
+- Declared ranges are unified as closed intervals.
 
 ### Others
 
-#### Opinter to member
+#### Opointer to member
 
 ```c++
 #include <kon/qi/member.hpp>
@@ -377,7 +378,7 @@ set(KON_QI_ENABLE_INLINE_ADDON OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     kon-qi
     GIT_REPOSITORY https://github.com/TypeCombinator/kon-qi.git
-    GIT_TAG        636409a1a22b35b75b6e0b956ffddfda529c6e16
+    GIT_TAG        19ed51a80ab27d7f35cfed216d1e683ae0c6acee
 )
 FetchContent_MakeAvailable(kon-qi)
 ```
