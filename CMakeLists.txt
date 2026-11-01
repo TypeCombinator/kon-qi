@@ -25,9 +25,21 @@ if(KON_QI_IS_TOP_LEVEL_PROJECT)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
 
+    # Drop head and tail double quotes from the extra compiler flags.
+    string(REGEX REPLACE "^\"" "" KON_QI_EXTRA_COMPILER_FLAGS "${KON_QI_EXTRA_COMPILER_FLAGS}")
+    string(REGEX REPLACE "\"$" "" KON_QI_EXTRA_COMPILER_FLAGS "${KON_QI_EXTRA_COMPILER_FLAGS}")
     # Add extra c/c++ flags.
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_COMPILER_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILER_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${KON_QI_EXTRA_COMPILER_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KON_QI_EXTRA_COMPILER_FLAGS}")
+
+    set(KON_QI_SANITIZER_COMPILE_OPTIONS "" CACHE STRING "Address sanitizer compile options")
+    set(KON_QI_SANITIZER_LINK_OPTIONS "" CACHE STRING "Address sanitizer link options")
+
+    if(KON_QI_CMAKE_BUILD_MODE STREQUAL "asan")
+        include(cmake/module/asan.cmake)
+        add_compile_options(${KON_QI_SANITIZER_COMPILE_OPTIONS})
+        add_link_options(${KON_QI_SANITIZER_LINK_OPTIONS})
+    endif()
 
     # include(cmake/module/fmt.cmake)
 endif()

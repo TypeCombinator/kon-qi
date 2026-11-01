@@ -10,7 +10,7 @@
 
 - **Annotations**: Attach arbitrary compile-time metadata to enum and struct, just like C++26.
 - **Enum reflection with multi-interval scanning**: Declare any number of disjoint value ranges to scan, so sparse enums cost almost no extra compile time.
-- **Optimized aggregate member count scanning**: Use *binary search* for scanning, and support scanning within a specified interval.
+- **Optimized aggregate member count scanning**: Use _binary search_ for scanning, and support scanning within a specified interval.
 - **Near-zero dependencies**: Only depends on the standard library's `<string_view>`, no `<array>`, no `<tuple>`!
 - **Only a few macros**: Macros are only needed when annotations are required, and these macros are only intended to reduce boilerplate code, so they are not mandatory either.
 
@@ -134,7 +134,7 @@ static_assert(ed_addon::size() == 0);
 
 ##### Use the default internal annotation
 
-There are two ways to add internal annotations, they are mutually exclusive, and you can only choose one of them. One is the **default internal annotation**, which requires separation from the member declaration, all annotations are placed in a template class named `addon_register`. 
+There are two ways to add internal annotations, they are mutually exclusive, and you can only choose one of them. One is the **default internal annotation**, which requires separation from the member declaration, all annotations are placed in a template class named `addon_register`.
 
 ```c++
 #include <kon/qi/struct.hpp>
@@ -366,7 +366,7 @@ ninja -C build/release
 
 There is a public example project available to help you get started with this library quickly, please see [kon-qi-starter](https://github.com/TypeCombinator/cpp-samples/tree/main/kon-qi-starter). The important usage steps are as follows:
 
-First, use `FetchContent` in your C++ project’s CMake file to fetch this library. 
+First, use `FetchContent` in your C++ project’s CMake file to fetch this library.
 
 ```cmake
 set(KON_QI_ENABLE_INLINE_ADDON OFF CACHE BOOL "" FORCE)

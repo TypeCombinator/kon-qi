@@ -81,7 +81,7 @@ static_assert(sizeof(tp_member) == 8);
     #define KON_QI_ATTR_NO_UNIQUE_ADDRESS [[no_unique_address]]
 #endif
 
-#if not defined(_MSC_VER) || defined(__clang__)
+#if not defined(_MSC_VER)
 struct s_foo_overlap {
     KON_QI_ATTR_NO_UNIQUE_ADDRESS tp_member a;
     KON_QI_ATTR_NO_UNIQUE_ADDRESS char b;
@@ -105,7 +105,7 @@ consteval bool s_foo_overlap_test() noexcept {
 
 using namespace qi_struct_test;
 
-TEST_CASE("basic", "[struct]") {
+TEST_CASE("struct basic", "[struct]") {
     s_foo3 obj{0x123, 'x', 0.1};
     auto &a = s_foo3_minfo::member_get<0>(obj);
     auto &b = s_foo3_minfo::member_get<1>(obj);

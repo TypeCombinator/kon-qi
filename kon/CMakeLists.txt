@@ -7,6 +7,10 @@ add_library(kon-qi INTERFACE)
 
 target_include_directories(kon-qi INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
+if(MSVC)
+  target_compile_options(kon-qi INTERFACE /utf-8 /Zc:preprocessor)
+endif()
+
 target_compile_definitions(kon-qi
   INTERFACE
     $<IF:$<BOOL:${KON_QI_ENABLE_INLINE_ADDON}>,KON_QI_ENABLE_INLINE_ADDON,>
