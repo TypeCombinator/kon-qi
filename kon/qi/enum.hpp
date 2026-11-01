@@ -38,8 +38,9 @@ struct enum_information {
     }
 };
 
+template <typename T>
 inline constexpr int default_enum_value_range[1][2] = {
-    {-128, 127}
+    {static_cast<T>(-1) < 0 ? -128 : 0, 127}
 };
 
 template <auto& ValueRanges, std::size_t VRN>
@@ -155,7 +156,7 @@ struct reflect_e {
         if constexpr (requires() { addon_type::value_range; }) {
             return make_enum_infomation<ET, addon_type::value_range>();
         } else {
-            return make_enum_infomation<ET, default_enum_value_range>();
+            return make_enum_infomation<ET, default_enum_value_range<utype>>();
         }
     }
 

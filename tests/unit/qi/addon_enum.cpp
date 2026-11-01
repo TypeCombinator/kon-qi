@@ -50,6 +50,16 @@ struct addon_register<kq_addon_enum_test::foo_sparse> {
 } // namespace kon::qi
 
 namespace kq_addon_enum_test {
+static_assert(kon::qi::default_enum_value_range<char>[0][0] < 0);
+static_assert(kon::qi::default_enum_value_range<int>[0][0] < 0);
+static_assert(kon::qi::default_enum_value_range<long>[0][0] < 0);
+static_assert(kon::qi::default_enum_value_range<long long>[0][0] < 0);
+
+static_assert(kon::qi::default_enum_value_range<unsigned char>[0][0] == 0);
+static_assert(kon::qi::default_enum_value_range<unsigned>[0][0] == 0);
+static_assert(kon::qi::default_enum_value_range<unsigned long>[0][0] == 0);
+static_assert(kon::qi::default_enum_value_range<unsigned long long>[0][0] == 0);
+
 template <typename ET>
 consteval bool test_enum_foo_addon() noexcept {
     using minfo = kon::qi::reflect_e<ET>;
