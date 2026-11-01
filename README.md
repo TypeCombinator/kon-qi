@@ -2,6 +2,9 @@
 [![C++](https://img.shields.io/badge/C%2B%2B-20%2B-blue.svg)](https://en.cppreference.com/w/cpp/compiler_support)
 [![License: BSL-1.0](https://img.shields.io/badge/License-Boost_1.0-lightblue.svg)](https://opensource.org/license/BSL-1.0)
 
+[![format](https://github.com/TypeCombinator/kon-qi/actions/workflows/format.yml/badge.svg)](https://github.com/TypeCombinator/kon-qi/actions/workflows/format.yml)
+[![build](https://github.com/TypeCombinator/kon-qi/actions/workflows/build.yml/badge.svg)](https://github.com/TypeCombinator/kon-qi/actions/workflows/build.yml)
+
 # `kon::qi`: A Last Generation Static Reflection Library for C++
 
 `kon::qi` is a header-only static reflection library for C++20 with **annotation** support. Yes, this isn’t next-gen, nor next-next-gen, it’s last-gen.
