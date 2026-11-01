@@ -44,13 +44,22 @@ inline constexpr int default_enum_value_range[1][2] = {
 
 template <auto& ValueRanges, std::size_t VRN>
 consteval std::size_t enum_total_space() noexcept {
-    std::size_t space{};
-    // TODO: Detect overlaps.
-    for (std::size_t i{}; i < VRN; i++) {
-        if (ValueRanges[i][1] < ValueRanges[i][0]) {
+    auto rmin = ValueRanges[0][0];
+    auto rmax = ValueRanges[0][1];
+    if (rmax < rmin) {
+        return 0;
+    }
+    std::size_t space = rmax - rmin;
+    for (std::size_t i{1}; i < VRN; i++) {
+        rmin = ValueRanges[i][0];
+        if (rmin < rmax) {
             return 0;
         }
-        space += (ValueRanges[i][1] - ValueRanges[i][0]) + 1;
+        rmax = ValueRanges[i][1];
+        if (rmax < rmin) {
+            return 0;
+        }
+        space += (rmax - rmin) + 1;
     }
     return space;
 }
