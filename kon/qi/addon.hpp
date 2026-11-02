@@ -5,6 +5,7 @@
 
 #ifndef ADDON_1A34AF33_3863_4910_984C_743C4E4BD1CD
 #define ADDON_1A34AF33_3863_4910_984C_743C4E4BD1CD
+#include <type_traits>
 #include <kon/qi/pack.hpp>
 
 #if defined(KON_QI_ENABLE_INLINE_ADDON)
@@ -68,6 +69,35 @@ struct addon_register {
     KON_QI_ADDON_INIT();
 };
 
+template <typename ET>
+struct enum_range {
+    using utype = std::underlying_type_t<ET>;
+    utype m_min, m_max;
+
+    enum_range() = default;
+
+    consteval enum_range(utype start, std::ptrdiff_t step = 0) noexcept {
+        // FIXME: Overflow or wraparound needs to be checked.
+        if (step > 0) {
+            m_min = start;
+            m_max = start + step;
+        } else {
+            m_min = start + step;
+            m_max = start;
+        }
+    }
+
+    consteval enum_range(ET e, std::ptrdiff_t step = 0) noexcept
+        : enum_range(static_cast<utype>(e), step) {
+    }
+
+    consteval enum_range(std::nullptr_t, utype min, utype max) noexcept
+        : m_min{min}
+        , m_max{max} {
+        // FIXME: Check the min and max.
+    }
+};
+
 template <typename T>
 concept has_inline_addon = requires() { typename T::addon_host_type; };
 
@@ -78,7 +108,7 @@ template <typename T>
 concept has_external_addon = requires() { typename addon_register<T>::addon_host_type; };
 
 template <typename Addon>
-concept has_enum_value_range = requires() { Addon::value_range; };
+concept has_enum_value_ranges = requires() { Addon::value_ranges; };
 
 template <typename Addon>
 concept has_struct_count_range = requires() { Addon::count_range; };

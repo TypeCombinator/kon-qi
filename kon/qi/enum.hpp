@@ -39,24 +39,18 @@ struct enum_information {
 };
 
 template <typename T>
-inline constexpr int default_enum_value_range[1][2] = {
-    {static_cast<T>(-1) < 0 ? -128 : 0, 127}
+inline constexpr enum_range<T> default_enum_value_ranges[1] = {
+    {nullptr, static_cast<std::underlying_type_t<T>>(-1) < 0 ? -128 : 0, 127}
 };
 
 template <auto& ValueRanges, std::size_t VRN>
 consteval std::size_t enum_total_space() noexcept {
-    auto rmin = ValueRanges[0][0];
-    auto rmax = ValueRanges[0][1];
-    if (rmax < rmin) {
-        return 0;
-    }
+    auto rmin = ValueRanges[0].m_min;
+    auto rmax = ValueRanges[0].m_max;
     std::size_t space = rmax - rmin;
     for (std::size_t i{1}; i < VRN; i++) {
-        rmin = ValueRanges[i][0];
-        if (rmin < rmax) {
-            return 0;
-        }
-        rmax = ValueRanges[i][1];
+        rmin = ValueRanges[i].m_min;
+        rmax = ValueRanges[i].m_max;
         if (rmax < rmin) {
             return 0;
         }
@@ -99,7 +93,7 @@ template <typename ET, std::size_t TotalSpace, auto& ValueRanges, std::size_t VR
 consteval enum_information<TotalSpace, ET> make_enum_information_impl() noexcept {
     enum_information<TotalSpace, ET> enum_info{};
     [&enum_info]<auto... Is>(index_sequence<Is...>) {
-        (enum_information_maker<ET, ValueRanges[Is][0], ValueRanges[Is][1]>::make(
+        (enum_information_maker<ET, ValueRanges[Is].m_min, ValueRanges[Is].m_max>::make(
              enum_info, enum_info.m_pretty_prefix),
          ...);
         std::size_t size = enum_info.m_size;
@@ -124,8 +118,7 @@ consteval enum_information<TotalSpace, ET> make_enum_information_impl() noexcept
 template <typename ET, auto& ValueRanges>
 consteval auto make_enum_infomation() noexcept {
     using vr_type = std::remove_reference_t<decltype(ValueRanges)>;
-    static_assert(std::rank_v<vr_type> == 2);
-    static_assert(std::extent_v<vr_type, 1> == 2);
+    static_assert(std::rank_v<vr_type> == 1);
     constexpr std::size_t vrn = std::extent_v<vr_type, 0>;
     static_assert(vrn > 0);
 
@@ -153,10 +146,10 @@ struct reflect_e {
     using type = ET;
 
     static consteval auto enum_information_select() noexcept {
-        if constexpr (requires() { addon_type::value_range; }) {
-            return make_enum_infomation<ET, addon_type::value_range>();
+        if constexpr (requires() { addon_type::value_ranges; }) {
+            return make_enum_infomation<ET, addon_type::value_ranges>();
         } else {
-            return make_enum_infomation<ET, default_enum_value_range<utype>>();
+            return make_enum_infomation<ET, default_enum_value_ranges<ET>>();
         }
     }
 

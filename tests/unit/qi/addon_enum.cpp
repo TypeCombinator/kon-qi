@@ -24,7 +24,7 @@ namespace kon::qi {
 template <>
 struct addon_register<kq_addon_enum_test::foo> {
     using addon_host_type = kq_addon_enum_test::foo;
-    static constexpr int value_range[][2] = {
+    static constexpr kon::qi::enum_range<addon_host_type> value_ranges[] = {
         {0, 10},
     };
     KON_QI_ADDON_E(a, 100, nullptr);
@@ -37,9 +37,9 @@ struct addon_register<kq_addon_enum_test::foo> {
 template <>
 struct addon_register<kq_addon_enum_test::foo_sparse> {
     using addon_host_type = kq_addon_enum_test::foo_sparse;
-    static constexpr int value_range[][2] = {
-        {   0,   10},
-        {1000, 1010},
+    static constexpr kon::qi::enum_range<addon_host_type> value_ranges[] = {
+        {   0, 10},
+        {1000, 10},
     };
     KON_QI_ADDON_E(a, 100, nullptr);
     KON_QI_ADDON_E(b, 'X');
@@ -50,22 +50,30 @@ struct addon_register<kq_addon_enum_test::foo_sparse> {
 } // namespace kon::qi
 
 namespace kq_addon_enum_test {
-static_assert(kon::qi::default_enum_value_range<char>[0][0] < 0);
-static_assert(kon::qi::default_enum_value_range<int>[0][0] < 0);
-static_assert(kon::qi::default_enum_value_range<long>[0][0] < 0);
-static_assert(kon::qi::default_enum_value_range<long long>[0][0] < 0);
+template <typename T>
+struct empty {
+    enum class type : T {
+    };
+};
 
-static_assert(kon::qi::default_enum_value_range<unsigned char>[0][0] == 0);
-static_assert(kon::qi::default_enum_value_range<unsigned>[0][0] == 0);
-static_assert(kon::qi::default_enum_value_range<unsigned long>[0][0] == 0);
-static_assert(kon::qi::default_enum_value_range<unsigned long long>[0][0] == 0);
+static_assert(kon::qi::default_enum_value_ranges<empty<char>::type>[0].m_min < 0);
+static_assert(kon::qi::default_enum_value_ranges<empty<short>::type>[0].m_min < 0);
+static_assert(kon::qi::default_enum_value_ranges<empty<int>::type>[0].m_min < 0);
+static_assert(kon::qi::default_enum_value_ranges<empty<long>::type>[0].m_min < 0);
+static_assert(kon::qi::default_enum_value_ranges<empty<long long>::type>[0].m_min < 0);
+
+static_assert(kon::qi::default_enum_value_ranges<empty<unsigned char>::type>[0].m_min == 0);
+static_assert(kon::qi::default_enum_value_ranges<empty<unsigned short>::type>[0].m_min == 0);
+static_assert(kon::qi::default_enum_value_ranges<empty<unsigned int>::type>[0].m_min == 0);
+static_assert(kon::qi::default_enum_value_ranges<empty<unsigned long>::type>[0].m_min == 0);
+static_assert(kon::qi::default_enum_value_ranges<empty<unsigned long long>::type>[0].m_min == 0);
 
 template <typename ET>
 consteval bool test_enum_foo_addon() noexcept {
     using minfo = kon::qi::reflect_e<ET>;
     using addon = minfo::addon_type;
 
-    static_assert(kon::qi::has_enum_value_range<addon>);
+    static_assert(kon::qi::has_enum_value_ranges<addon>);
 
     static_assert(minfo::size() == 4);
 
