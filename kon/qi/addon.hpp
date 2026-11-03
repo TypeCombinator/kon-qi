@@ -56,6 +56,17 @@ struct value_identity {
     template <typename AddonTag>                                                                   \
     using of = decltype(of_impl(AddonTag{}))
 
+
+#define KON_QI_ENUM_POINT(_ev_)       static_cast<__underlying_type(addon_host_type)>(_ev_)
+
+#define KON_QI_ENUM_POINT_RANGE(_ev_) {KON_QI_ENUM_POINT(_ev_), KON_QI_ENUM_POINT(_ev_)}
+
+#define KON_QI_ENUM_UP_RANGE(_ev_, _step_)                                                         \
+    {KON_QI_ENUM_POINT(_ev_), KON_QI_ENUM_POINT(_ev_) + _step_}
+
+#define KON_QI_ENUM_DOWN_RANGE(_ev_, _step_)                                                       \
+    {KON_QI_ENUM_POINT(_ev_) + _step_, KON_QI_ENUM_POINT(_ev_)}
+
 namespace kon {
 //
 namespace qi {
@@ -78,7 +89,7 @@ template <typename T>
 concept has_external_addon = requires() { typename addon_register<T>::addon_host_type; };
 
 template <typename Addon>
-concept has_enum_value_range = requires() { Addon::value_range; };
+concept have_enum_value_ranges = requires() { Addon::value_ranges; };
 
 template <typename Addon>
 concept has_struct_count_range = requires() { Addon::count_range; };

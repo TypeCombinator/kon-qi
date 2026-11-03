@@ -95,8 +95,8 @@ namespace kon::qi {
 template <>
 struct addon_register<system_error> {
     using addon_host_type = system_error;
-    // Specify the scan range.
-    static constexpr int value_range[][2] = {
+    // Specify the scan ranges.
+    static constexpr int value_ranges[][2] = {
         {   0,   10},
         {1000, 1010},
     };
@@ -257,11 +257,11 @@ static_assert(pz_addon::size() == 0);
 
 #### Built-in annotations
 
-Some annotations are built-in. Currently, the only built-in annotations are `value_range` and `count_value`.
+Some annotations are built-in. Currently, the only built-in annotations are `value_ranges` and `count_value`.
 
-##### value_range
+##### value_ranges
 
-Enum reflection is implemented by scanning ranges. Most of the time, user-defined enum values fall within a very small range. Sometimes, however, enum values are spread across multiple widely separated ranges. The default scan range is `[-128, 127]`, using the `value_range` annotation, you can specify multiple scan ranges, which can save compile time.
+Enum reflection is implemented by scanning ranges. Most of the time, user-defined enum values fall within a very small range. Sometimes, however, enum values are spread across multiple widely separated ranges. The default scan range is `[-128, 127]`, using the `value_ranges` annotation, you can specify multiple scan ranges, which can save compile time.
 
 ```c++
 #include <kon/qi/enum.hpp>
@@ -277,8 +277,8 @@ namespace kon::qi {
 template <>
 struct addon_register<system_error> {
     using addon_host_type = system_error;
-    // Specify the scan range.
-    static constexpr int value_range[][2] = {
+    // Specify the scan ranges.
+    static constexpr int value_ranges[][2] = {
         {   0,   10},
         {1000, 1010},
     };
@@ -394,4 +394,4 @@ target_link_libraries(${YOUR_TARGET}
 
 ## Inspiration
 
-The [qlibs/reflect](https://github.com/qlibs/reflect) library provided some inspiration, but it lacks annotation support. Because `kon::qi` implements annotations, its implementation of enum reflection is no longer limited by scan ranges. In addition, `kon::qi` includes numerous optimizations at the implementation level, minimizing repeated compile-time computations.
+The [qlibs/reflect](https://github.com/qlibs/reflect) library provided some inspiration, but it lacks annotation support. Because `kon::qi` implements annotations, its implementation of enum reflection is no longer limited by scan range. In addition, `kon::qi` includes numerous optimizations at the implementation level, minimizing repeated compile-time computations.

@@ -17,7 +17,7 @@ struct enum_information {
 
     std::size_t m_size;
     bool m_is_continuous;
-    utype m_values[N + 1];
+    utype m_values[N + 1]; // It might be better to use `m_values[N + (N == 0)]`.
     std::string_view m_names[N + 1];
     std::string_view m_pretty_prefix;
 
@@ -39,7 +39,7 @@ struct enum_information {
 };
 
 template <typename T>
-inline constexpr int default_enum_value_range[1][2] = {
+inline constexpr T default_enum_value_ranges[1][2] = {
     {static_cast<T>(-1) < 0 ? -128 : 0, 127}
 };
 
@@ -50,7 +50,7 @@ consteval std::size_t enum_total_space() noexcept {
     if (rmax < rmin) {
         return 0;
     }
-    std::size_t space = rmax - rmin;
+    std::size_t space = rmax - rmin + 1;
     for (std::size_t i{1}; i < VRN; i++) {
         rmin = ValueRanges[i][0];
         if (rmin < rmax) {
@@ -130,7 +130,7 @@ consteval auto make_enum_infomation() noexcept {
     static_assert(vrn > 0);
 
     constexpr std::size_t space = enum_total_space<ValueRanges, vrn>();
-    static_assert(space > 0, "The value_range must be in ascending order and non-overlapping.");
+    static_assert(space > 0, "The value_ranges must be in ascending order and non-overlapping.");
 
     constexpr enum_information<space, ET> enum_infos =
         make_enum_information_impl<ET, space, ValueRanges, vrn>();
@@ -153,10 +153,10 @@ struct reflect_e {
     using type = ET;
 
     static consteval auto enum_information_select() noexcept {
-        if constexpr (requires() { addon_type::value_range; }) {
-            return make_enum_infomation<ET, addon_type::value_range>();
+        if constexpr (requires() { addon_type::value_ranges; }) {
+            return make_enum_infomation<ET, addon_type::value_ranges>();
         } else {
-            return make_enum_infomation<ET, default_enum_value_range<utype>>();
+            return make_enum_infomation<ET, default_enum_value_ranges<utype>>();
         }
     }
 
