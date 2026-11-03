@@ -16,8 +16,8 @@ namespace kon::qi {
 template <>
 struct addon_register<system_error> {
     using addon_host_type = system_error;
-    // Specify the scan range.
-    static constexpr int value_range[][2] = {
+    // Specify the scan ranges.
+    static constexpr int value_ranges[][2] = {
         {   0,   10},
         {1000, 1010},
     };
@@ -29,7 +29,7 @@ struct addon_register<system_error> {
     KON_QI_ADDON_INIT();
 };
 
-static_assert(has_enum_value_range<addon_register<system_error>>);
+static_assert(have_enum_value_ranges<addon_register<system_error>>);
 } // namespace kon::qi
 
 using minfo = kon::qi::reflect_e<system_error>;
