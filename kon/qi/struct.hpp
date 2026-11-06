@@ -79,11 +79,6 @@ consteval std::string_view member_name() noexcept {
     return {name.data() + offset, name.size() - (offset + member_guider::rgarbage)};
 }
 
-template <auto& obj>
-constexpr auto mvisit_as_nttp(size_constant<0>, auto&& fun) noexcept {
-    return fun.template operator()<>();
-}
-
 template <typename T>
 constexpr decltype(auto) mvisit(size_constant<0>, T&& obj, auto&& fun) noexcept {
     return fun();
@@ -92,11 +87,6 @@ constexpr decltype(auto) mvisit(size_constant<0>, T&& obj, auto&& fun) noexcept 
 #define FWD_BINDING_T(_m_) forward_binding<T, decltype(_m_)>(_m_)
 
 #define KON_CALL_VA(_i_, ...)                                                                      \
-    template <auto& obj>                                                                           \
-    constexpr auto mvisit_as_nttp(size_constant<_i_>, auto&& fun) noexcept {                       \
-        auto&& [__VA_ARGS__] = obj;                                                                \
-        return fun.template operator()<KON_CALL_EACH##_i_(&, __VA_ARGS__)>();                      \
-    }                                                                                              \
     template <typename T>                                                                          \
     constexpr decltype(auto) mvisit(size_constant<_i_>, T&& obj, auto&& fun) noexcept {            \
         auto&& [__VA_ARGS__] = KON_QI_FFWD1(obj);                                                  \
@@ -133,11 +123,11 @@ consteval struct_member_offsets<N> make_struct_member_offsets() noexcept {
         }
     };
 
-    std::size_t* offset = offsets.m_data;
     // Although there exist algorithms with lower worst-case complexity, considering that this is a
     // compile-time computation, the code should remain simple, and performance in most scenarios
     // should be prioritized.
-    detail::mvisit(size_constant<N>{}, CODECL<U>.t, [offset](auto&&... ms) mutable {
+    detail::mvisit(size_constant<N>{}, CODECL<U>.t, [&offsets](auto&&... ms) {
+        std::size_t* offset = offsets.m_data;
         const unsigned char* init = CODECL<U>.buffer;
         const void* targets[N + 1] = {&ms..., nullptr};
         std::size_t msizes[N + 1] = {sizeof(ms)..., 0};

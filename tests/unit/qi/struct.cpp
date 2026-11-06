@@ -73,20 +73,17 @@ struct empty_member1 { };
 
 static_assert(sizeof(tp_member) == 8);
 
-
-// TODO: Move the attribute definition into a header file.
-#if defined(__has_cpp_attribute) && __has_cpp_attribute(msvc::no_unique_address)
-    #define KON_QI_ATTR_NO_UNIQUE_ADDRESS [[msvc::no_unique_address]]
-#else
-    #define KON_QI_ATTR_NO_UNIQUE_ADDRESS [[no_unique_address]]
-#endif
-
+// Both MSVC's implementations of [[no_unique_address]] and [[msvc::no_unique_address]] have issues.
 #if not defined(_MSC_VER)
 struct s_foo_overlap {
-    KON_QI_ATTR_NO_UNIQUE_ADDRESS tp_member a;
-    KON_QI_ATTR_NO_UNIQUE_ADDRESS char b;
-    KON_QI_ATTR_NO_UNIQUE_ADDRESS empty_member0 c;
-    KON_QI_ATTR_NO_UNIQUE_ADDRESS empty_member1 d;
+    [[no_unique_address]]
+    tp_member a;
+    [[no_unique_address]]
+    char b;
+    [[no_unique_address]]
+    empty_member0 c;
+    [[no_unique_address]]
+    empty_member1 d;
 };
 
 static_assert(sizeof(s_foo_overlap) == 8);

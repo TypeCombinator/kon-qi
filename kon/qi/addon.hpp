@@ -10,17 +10,22 @@
 #if defined(KON_QI_ENABLE_INLINE_ADDON)
     // Inline addon for the struct member.
     #if _MSC_VER && not defined(__clang__)
+namespace kon {
+//
+namespace qi {
 template <auto V>
 struct value_identity {
     static constexpr auto value = V;
 };
+} // namespace qi
+} // namespace kon
 
         #define KON_QI_IADDON_M(_m_, ...)                                                          \
             _m_;                                                                                   \
             template <typename AHT>                                                                \
             static kon::qi::value_pack<__VA_ARGS__> of_impl(                                       \
                 kon::qi::addon_tag<static_cast<const void *>(                                      \
-                    value_identity<&(CODECL<AHT>._m_)>::value)>)
+                    kon::qi::value_identity<&(CODECL<AHT>._m_)>::value)>)
     #else
         #define KON_QI_IADDON_M(_m_, ...)                                                          \
             _m_;                                                                                   \
