@@ -36,8 +36,15 @@ jobs:
       - name: Configure
         run: |
           pixi run toolchain ${{ matrix.toolchain }} ${{ matrix.build_mode }}
-          pixi run config ${{ matrix.build_mode }}
+          pixi run config ${{ matrix.build_mode }} -- -DKON_QI_ENABLE_INLINE_ADDON=OFF
       - name: Build
         run: pixi run build ${{ matrix.build_mode }}
       - name: Test
+        run: pixi run test ${{ matrix.build_mode }}
+
+      - name: Configure (KON_QI_ENABLE_INLINE_ADDON=ON)
+        run: pixi run config ${{ matrix.build_mode }} -- -DKON_QI_ENABLE_INLINE_ADDON=ON
+      - name: Build (KON_QI_ENABLE_INLINE_ADDON=ON)
+        run: pixi run build ${{ matrix.build_mode }}
+      - name: Test (KON_QI_ENABLE_INLINE_ADDON=ON)
         run: pixi run test ${{ matrix.build_mode }}

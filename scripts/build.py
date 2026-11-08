@@ -23,9 +23,15 @@ COVERAGE_TOOLCHAIN = Path("cmake/toolchain/clang.cmake")
 class Builder:
     """Configure, build and test this project with CMake/Ninja."""
 
-    def __init__(self, build_mode: str, toolchain: Path | None = None) -> None:
+    def __init__(
+        self,
+        build_mode: str,
+        toolchain: Path | None = None,
+        extra_args: Sequence[str] = (),
+    ) -> None:
         self.build_mode = build_mode
         self.toolchain = toolchain
+        self.extra_args = tuple(extra_args)
         self.cmake_build_type = CMAKE_BUILD_TYPES[build_mode]
         self.build_dir = Path(f"build/{build_mode}")
 
@@ -63,15 +69,20 @@ class Builder:
         toolchain_file = self._resolve_toolchain()
         if toolchain_file is not None:
             cmd += ["--toolchain", str(toolchain_file)]
+        cmd += list(self.extra_args)
         return self._run_subprocess(cmd)
 
     def build(self) -> int:
         """Build an already configured directory with Ninja (mirrors scripts/build.sh)."""
-        return self._run_subprocess(["ninja", "-C", str(self.build_dir)])
+        return self._run_subprocess(
+            ["ninja", "-C", str(self.build_dir), *self.extra_args]
+        )
 
     def clean(self) -> int:
         """Remove built artifacts with Ninja's clean tool."""
-        return self._run_subprocess(["ninja", "-C", str(self.build_dir), "-t", "clean"])
+        return self._run_subprocess(
+            ["ninja", "-C", str(self.build_dir), "-t", "clean", *self.extra_args]
+        )
 
     def remove(self) -> int:
         """Remove the entire build directory of the specified build mode."""
@@ -84,7 +95,13 @@ class Builder:
         build_dir = self.build_dir / "tests" / "unit"
         if self.build_mode != "coverage":
             return self._run_subprocess(
-                ["ctest", "--test-dir", str(build_dir), "--output-on-failure"]
+                [
+                    "ctest",
+                    "--test-dir",
+                    str(build_dir),
+                    "--output-on-failure",
+                    *self.extra_args,
+                ]
             )
         # Coverage test only for Linux.
         llvm_profile_dir = self.build_dir / "profiles"
@@ -100,6 +117,7 @@ class Builder:
                 "--test-dir",
                 str(build_dir),
                 "--output-on-failure",
+                *self.extra_args,
             ]
         )
 
@@ -120,13 +138,25 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     subparsers = parser.add_subparsers(dest="action", required=True, metavar="action")
     for action, help_text in ACTIONS.items():
-        subparser = subparsers.add_parser(action, help=help_text)
+        subparser = subparsers.add_parser(
+            action,
+            help=help_text,
+            epilog=(
+                "Any arguments after '--' are appended verbatim to the "
+                "underlying tool's command line (cmake, ninja or ctest)."
+            ),
+        )
         subparser.add_argument(
             "build_mode",
             nargs="?",
             choices=tuple(CMAKE_BUILD_TYPES),
             default="release",
             help="build mode to operate on",
+        )
+        subparser.add_argument(
+            "extra_args",
+            nargs=argparse.REMAINDER,
+            help=argparse.SUPPRESS,
         )
         if action == "config":
             subparser.add_argument(
@@ -140,7 +170,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
     args = parser.parse_args(argv)
 
-    builder = Builder(args.build_mode, toolchain=getattr(args, "toolchain", None))
+    builder = Builder(
+        args.build_mode,
+        toolchain=getattr(args, "toolchain", None),
+        extra_args=args.extra_args,
+    )
     return getattr(builder, args.action)()
 
 
