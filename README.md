@@ -319,7 +319,7 @@ static_assert(minfo::size() == 3);
 
 ### Others
 
-#### Opointer to member
+#### Pointer to member
 
 ```c++
 #include <kon/qi/member.hpp>
