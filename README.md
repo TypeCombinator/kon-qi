@@ -393,3 +393,5 @@ target_link_libraries(${YOUR_TARGET}
 ## Inspiration
 
 The [qlibs/reflect](https://github.com/qlibs/reflect) library provided some inspiration, but it lacks annotation support. Because `kon::qi` implements annotations, its implementation of enum reflection is no longer limited by scan range. In addition, `kon::qi` includes numerous optimizations at the implementation level, minimizing repeated compile-time computations.
+
+The build and CI-related code in this project partially references [clice-io/kotatsu](https://github.com/clice-io/kotatsu).
